@@ -107,8 +107,33 @@ public class Model extends Observable {
      *    and the trailing tile does not.
      * */
     public boolean tilt(Side side) {
+        /*
+        Thoughts
+        - Let's take a given column
+        - Start from the leader. Leader needs to be at row 0
+        - Iterate on down. if row + 1 = row, then merge the rows
+        - if a row is merged, flip it to merged as true
+        - if null, then move the next row up
+        - Iterate over all the columns
+
+        Generalize:
+        - Left and right will need to look at rows
+        - Up and down will need to look at cols
+        - Leader will indicate which tile needs to move first
+
+        High-level structure:
+        - Determine partition structure based on n/s/e/w
+        - Get a list of leaders for a given partition
+        - Construct the logic of the new partition
+            - Merge relevant tiles
+            - Update score
+        - Iterate over the other partitions
+         */
         boolean changed;
         changed = false;
+        Board b = this.board;
+
+
 
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
@@ -137,7 +162,6 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
         for (int row = 0; row < b.size(); row = row + 1) {
             for (int col = 0; col < b.size(); col = col + 1) {
                 if(b.tile(row, col) == null) {
@@ -154,7 +178,13 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        for (int row = 0; row < b.size(); row = row + 1) {
+            for (int col = 0; col < b.size(); col = col + 1) {
+                if(b.tile(row, col) != null && b.tile(row, col).value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -165,10 +195,57 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        /*
+        Approach:
+        1) Check for an empty space in the board - we already have emptySpaceExists
+        2) Check for neighbors with the same value
+            - iterate over the board, get the tile
+            - for each tile, iterate 1 above, 1 below, 1 to the left, and 1 to the right
+            - know when the board's limit is hit and bounce out of it
+         */
+        //use emptySpaceExists abstraction
+        if (emptySpaceExists(b) == true) {
+            return true;
+        }
+        //iterate over every tile and check the neighboring values
+        for (int row = 0; row < b.size(); row = row + 1) {
+            for (int col = 0; col < b.size(); col = col + 1) {
+                if (checkNeighborValues(b.tile(col, row), b)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
+    /*
+    Returns true if a neighboring tile has the same value as Tile t.
+     */
+    public static boolean checkNeighborValues(Tile t, Board b) {
+        int max_size = b.size();
+        int row = t.row();
+        int col = t.col();
+        int val = t.value();
+
+        //check above
+        if (row + 1 < max_size && b.tile(col, row + 1).value() == val) {
+            return true;
+        }
+        //check below
+        if (row - 1 >= 0 && b.tile(col, row - 1).value() == val) {
+            return true;
+        }
+        //check right
+        if (col + 1 < max_size && b.tile(col  + 1, row).value() == val) {
+            return true;
+        }
+        //check left
+        if (col - 1 >= 0 && b.tile(col - 1, row).value() == val) {
+            return true;
+        }
+
+        return false;
+    }
 
     @Override
      /** Returns the model as a string, used for debugging. */
