@@ -11,7 +11,7 @@ public class Model extends Observable {
     /** Current contents of the board. */
     private Board board;
     /** Current score. */
-    private int score;
+    private static int score;
     /** Maximum score so far.  Updated when game ends. */
     private int maxScore;
     /** True iff game is ended. */
@@ -107,43 +107,281 @@ public class Model extends Observable {
      *    and the trailing tile does not.
      * */
     public boolean tilt(Side side) {
-        /*
-        Thoughts
-        - Let's take a given column
-        - Start from the leader. Leader needs to be at row 0
-        - Iterate on down. if row + 1 = row, then merge the rows
-        - if a row is merged, flip it to merged as true
-        - if null, then move the next row up
-        - Iterate over all the columns
-
-        Generalize:
-        - Left and right will need to look at rows
-        - Up and down will need to look at cols
-        - Leader will indicate which tile needs to move first
-
-        High-level structure:
-        - Determine partition structure based on n/s/e/w
-        - Get a list of leaders for a given partition
-        - Construct the logic of the new partition
-            - Merge relevant tiles
-            - Update score
-        - Iterate over the other partitions
-         */
         boolean changed;
         changed = false;
         Board b = this.board;
+        int max_size = b.size();
 
+        for (int i = 0; i < max_size; i = i + 1) {
+            Tile[] partition = getPartition(this.board, side, i);
+            if (side == Side.NORTH){
+                if (NorthLogic(partition, i, this.board) == true) {
+                changed = true;
+            }}
 
+            if (side == Side.SOUTH){
+                if (SouthLogic(partition, i, this.board) == true) {
+                    changed = true;
+                }}
 
-        // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
+            if (side == Side.EAST){
+                if (EastLogic(partition, i, this.board) == true) {
+                    changed = true;
+                }}
+
+            if (side == Side.WEST){
+                if (WestLogic(partition, i, this.board) == true) {
+                    changed = true;
+                }}
+
+        }
 
         checkGameOver();
         if (changed) {
             setChanged();
         }
         return changed;
+    }
+
+    public static Boolean NorthLogic(Tile[] partition, int partNum, Board b) {
+        /*
+        We get a partition that we need to iterate over.
+        - the first null is our place
+        - when we merge, we need to track the merge_place
+        - if a place is not null, but there is a place to track, we need to move the tile there and decrement the place
+        - if the previous and the current are the same, we need to merge
+         */
+
+        boolean changed = false;
+        int place = -1;
+        int merge_place = -1;
+        Tile prev = null;
+
+        // we move backwards when it's north
+        for (int i = partition.length - 1; i >= 0; i = i - 1) {
+
+            // track the first null
+            if (partition[i] == null && place == -1) {
+                place = i; // the first time we encounter a null, track it
+            }
+
+            // logic for handling merges
+            else if (prev != null && partition[i] != null && prev.value() == partition[i].value()) {
+                    b.move(partNum, merge_place, partition[i]);
+                    prev = null;
+                    changed = true;
+                    score += partition[i].value();
+                    place = merge_place - 1; //since a merge happened, the next null place is after this
+                }
+
+            // non-null tile has a null place behind it
+            else if (place != -1 && partition[i] != null) {
+                changed = true;
+                //move the tile to the first null position
+                b.move(partNum, place, partition[i]);
+                prev = partition[i];
+                merge_place = place;
+                place = place - 1;
+            }
+
+            // non null tile doesn't have null place behind it
+            else if (partition[i] != null) {
+                prev = partition[i];
+                merge_place = i; // this is where the next merge could happen
+            }
+
+            }
+        return changed;
+    }
+
+    public static Boolean SouthLogic(Tile[] partition, int partNum, Board b) {
+        /*
+        We get a partition that we need to iterate over.
+        - the first null is our place
+        - when we merge, we need to track the merge_place
+        - if a place is not null, but there is a place to track, we need to move the tile there and decrement the place
+        - if the previous and the current are the same, we need to merge
+         */
+
+        boolean changed = false;
+        int place = -1;
+        int merge_place = -1;
+        Tile prev = null;
+
+        // we move backwards when it's north
+        for (int i = 0; i < partition.length; i = i + 1) {
+
+            // track the first null
+            if (partition[i] == null && place == -1) {
+                place = i; // the first time we encounter a null, track it
+            }
+
+            // logic for handling merges
+            else if (prev != null && partition[i] != null && prev.value() == partition[i].value()) {
+                b.move(partNum, merge_place, partition[i]);
+                prev = null;
+                changed = true;
+                score += partition[i].value();
+                place = merge_place + 1; //since a merge happened, the next null place is after this
+            }
+
+            // non-null tile has a null place behind it
+            else if (place != -1 && partition[i] != null) {
+                changed = true;
+                //move the tile to the first null position
+                b.move(partNum, place, partition[i]);
+                prev = partition[i];
+                merge_place = place;
+                place = place + 1;
+            }
+
+            // non null tile doesn't have null place behind it
+            else if (partition[i] != null) {
+                prev = partition[i];
+                merge_place = i; // this is where the next merge could happen
+            }
+
+        }
+        return changed;
+    }
+
+    public static Boolean EastLogic(Tile[] partition, int partNum, Board b) {
+        /*
+        We get a partition that we need to iterate over.
+        - the first null is our place
+        - when we merge, we need to track the merge_place
+        - if a place is not null, but there is a place to track, we need to move the tile there and decrement the place
+        - if the previous and the current are the same, we need to merge
+         */
+
+        boolean changed = false;
+        int place = -1;
+        int merge_place = -1;
+        Tile prev = null;
+
+        // we move backwards when it's north
+        for (int i = partition.length - 1; i >= 0; i = i - 1) {
+
+            // track the first null
+            if (partition[i] == null && place == -1) {
+                place = i; // the first time we encounter a null, track it
+            }
+
+            // logic for handling merges
+            else if (prev != null && partition[i] != null && prev.value() == partition[i].value()) {
+                b.move(merge_place, partNum, partition[i]);
+                prev = null;
+                changed = true;
+                score += partition[i].value();
+                place = merge_place - 1; //since a merge happened, the next null place is after this
+            }
+
+            // non-null tile has a null place behind it
+            else if (place != -1 && partition[i] != null) {
+                changed = true;
+                //move the tile to the first null position
+                b.move(place, partNum, partition[i]);
+                prev = partition[i];
+                merge_place = place;
+                place = place - 1;
+            }
+
+            // non null tile doesn't have null place behind it
+            else if (partition[i] != null) {
+                prev = partition[i];
+                merge_place = i; // this is where the next merge could happen
+            }
+
+        }
+        return changed;
+    }
+
+    public static Boolean WestLogic(Tile[] partition, int partNum, Board b) {
+        /*
+        We get a partition that we need to iterate over.
+        - the first null is our place
+        - when we merge, we need to track the merge_place
+        - if a place is not null, but there is a place to track, we need to move the tile there and decrement the place
+        - if the previous and the current are the same, we need to merge
+         */
+
+        boolean changed = false;
+        int place = -1;
+        int merge_place = -1;
+        Tile prev = null;
+
+        // we move backwards when it's north
+        for (int i = 0; i < partition.length; i = i + 1) {
+
+            // track the first null
+            if (partition[i] == null && place == -1) {
+                place = i; // the first time we encounter a null, track it
+            }
+
+            // logic for handling merges
+            else if (prev != null && partition[i] != null && prev.value() == partition[i].value()) {
+                b.move(merge_place, partNum, partition[i]);
+                prev = null;
+                changed = true;
+                score += partition[i].value();
+                place = merge_place + 1; //since a merge happened, the next null place is after this
+            }
+
+            // non-null tile has a null place behind it
+            else if (place != -1 && partition[i] != null) {
+                changed = true;
+                //move the tile to the first null position
+                b.move(place, partNum, partition[i]);
+                prev = partition[i];
+                merge_place = place;
+                place = place + 1;
+            }
+
+            // non null tile doesn't have null place behind it
+            else if (partition[i] != null) {
+                prev = partition[i];
+                merge_place = i; // this is where the next merge could happen
+            }
+
+        }
+        return changed;
+    }
+
+    /*
+    Gets the partition for a given tilt.
+    For example, if tilted north, it captures each column in order of consideration.
+     */
+    public static Tile[] getPartition(Board b, Side side, int i) {
+        int len = b.size();
+        Tile[] partition = new Tile[len];
+
+        // direction will indicate which way we iterate the partition
+        if (side == Side.NORTH) {
+            for (int k = 0; k < len; k = k + 1) {
+                partition[k] = b.tile(i, k); // North should be partitioned on col
+            }
+        }
+
+        if (side == Side.SOUTH) {
+            for (int k = len - 1; k >= 0; k = k - 1) {
+                partition[k] = b.tile(i, k); // South should be partitioned on col
+            }
+        }
+
+        if (side == Side.WEST) {
+            for (int k = 0; k < len; k = k + 1) {
+                partition[k] = b.tile(k, i);
+            }
+        }
+
+        if (side == Side.EAST) {
+            for (int k = len - 1; k >= 0; k = k - 1) {
+                partition[k] = b.tile(k, i); // North should be partitioned on col
+            }
+        }
+
+
+        return partition;
     }
 
     /** Checks if the game is over and sets the gameOver variable
