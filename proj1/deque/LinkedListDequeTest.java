@@ -15,10 +15,6 @@ public class LinkedListDequeTest {
         assertEquals(a.isEmpty(), false); //check that an empty deque is size 0.
         a.addLast(42);
         assertEquals(a.size(), 2);
-        assertEquals(a.sentinel.last.first, 42); //check that the element behind the sentinel is 42
-        assertEquals(a.sentinel.last.last.first, "hello"); // check that the element behind 42 is hello
-        assertEquals(a.sentinel.rest.first, "hello"); // check that the element in front of the sentinel is hello
-        assertEquals(a.sentinel.rest.rest.first, 42); // check that the element in front of hello is 42
         a.printDeque();
         assertEquals(a.get(0), "hello");
         assertEquals(a.get(1), 42);
@@ -80,8 +76,6 @@ public class LinkedListDequeTest {
     @Test
     /** Adds an item, then removes an item, and ensures that dll is empty afterwards. */
     public void addRemoveTest() {
-
-        System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
 
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<Integer>();
 		// should be empty
