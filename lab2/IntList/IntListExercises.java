@@ -79,4 +79,53 @@ public class IntListExercises {
 
         return squarePrimes(lst.rest) || currElemIsPrime;
     }
+
+    public static class SLList {
+        public IntList item;
+
+        public SLList(int x) {
+            item = new IntList(x, null);
+        }
+
+        public void addFirst(int x) {
+            item = new IntList(x, item);
+        }
+
+        public int getFirst() {
+            return item.first;
+        }
+
+        public void addLast(int x) {
+            IntList p = item;
+            while (p != null) {
+                p = p.rest;
+            }
+            p = new IntList(x, null);
+        }
+
+        public int SSize(){
+            IntList p = item;
+            int count = 0;
+            while (p != null) {
+                count += 1;
+                p = p.rest;
+            }
+            return count;
+        }
+
+    }
+public static void main(String[] args){
+
+  SLList a = new SLList(5);
+  a.addFirst(10);
+  a.addFirst(15);
+  a.addLast(20);
+
+  System.out.println(a);
+  System.out.println(a.SSize());
+}
+
+
+
+
 }
