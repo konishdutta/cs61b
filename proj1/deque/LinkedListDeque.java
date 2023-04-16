@@ -66,6 +66,9 @@ public class LinkedListDeque <T> {
     }
 
     public T removeFirst() {
+        if (size == 0) {
+            return null;
+        }
         T val = sentinel.rest.first;
         sentinel.rest = sentinel.rest.rest;
         sentinel.rest.last = sentinel;
@@ -74,6 +77,9 @@ public class LinkedListDeque <T> {
     }
 
     public T removeLast() {
+        if (size == 0) {
+            return null;
+        }
         T val = sentinel.last.first;
         sentinel.last = sentinel.last.last;
         sentinel.last.rest = sentinel;

@@ -33,4 +33,21 @@ public class ArrayDequeueTest {
         assertEquals(a.equals(c), false);
 
     }
+
+    @Test
+    public void HugeArrayTest() {
+        ArrayDeque a = new ArrayDeque();
+        for (int i = 0; i < 100; i += 1) {
+            a.addFirst(i);
+        }
+
+        for (int i = 0; i < 100; i += 1) {
+            a.addLast(i);
+        }
+        assertEquals(a.size(), 200);
+        assertEquals(99, a.get(0));
+        assertEquals(99, a.get(199));
+        assertEquals(0, a.get(100));
+
+    }
 }
