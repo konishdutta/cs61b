@@ -1,6 +1,6 @@
 package deque;
 
-public class LinkedListDeque <T> {
+public class LinkedListDeque <T> implements Deque <T> {
     private class Node {
         private T first;
         private Node rest;
@@ -35,27 +35,23 @@ public class LinkedListDeque <T> {
         sentinel.last = sentinel;
         size = 0;
     }
+    @Override
     public int size() {
         return size;
     }
-
+    @Override
     public void addFirst (T item) {
         sentinel.rest = new Node(item, sentinel.rest, sentinel);
         sentinel.rest.rest.last = sentinel.rest;
         size += 1;
     }
-
+    @Override
     public void addLast (T item) {
         sentinel.last = new Node(item, sentinel, sentinel.last);
         sentinel.last.last.rest = sentinel.last;
         size += 1;
     }
-    public boolean isEmpty() {
-        if (sentinel.rest == sentinel && sentinel.last == sentinel) {
-            return true;
-        }
-        return false;
-    }
+    @Override
     public void printDeque() {
         Node p = sentinel.rest;
         while (p != sentinel) {
@@ -64,7 +60,7 @@ public class LinkedListDeque <T> {
         }
         System.out.println();
     }
-
+    @Override
     public T removeFirst() {
         if (size == 0) {
             return null;
@@ -75,7 +71,7 @@ public class LinkedListDeque <T> {
         size -= 1;
         return val;
     }
-
+    @Override
     public T removeLast() {
         if (size == 0) {
             return null;
@@ -86,7 +82,7 @@ public class LinkedListDeque <T> {
         size -= 1;
         return val;
     }
-
+    @Override
     public T get(int index) {
         Node p = sentinel.rest;
         while (index > 0 && p != sentinel) {
@@ -96,6 +92,7 @@ public class LinkedListDeque <T> {
 
         return p.first;
     }
+    @Override
     public boolean equals(Object o) {
         if (o instanceof LinkedListDeque && equal_helper(this, (LinkedListDeque) o)) {
             return true;

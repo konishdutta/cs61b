@@ -1,6 +1,6 @@
 package deque;
 
-public class ArrayDeque <T> {
+public class ArrayDeque <T> implements Deque <T> {
     private T[] lst;
     private int size;
     private int first;
@@ -11,6 +11,7 @@ public class ArrayDeque <T> {
         first = 3;
         last = 4;
     }
+    @Override
     public void addFirst(T item) {
         resize(); // method that checks resizing
         lst[first] = item;
@@ -54,6 +55,7 @@ public class ArrayDeque <T> {
         last = size;
         lst = tmp;
     }
+    @Override
     public void addLast(T item) {
         resize(); // method that checks resizing
         lst[last] = item;
@@ -61,12 +63,11 @@ public class ArrayDeque <T> {
         size += 1;
         last = checkBounds(last);
     }
-    public boolean isEmpty() {
-        return size == 0;
-    }
+    @Override
     public int size() {
         return size;
     }
+    @Override
     public void printDeque() {
         int p = 0;
         while (p < size) {
@@ -75,6 +76,7 @@ public class ArrayDeque <T> {
         }
         System.out.println();
     }
+    @Override
     public T removeFirst() {
         if (size == 0) {
             return null;
@@ -86,6 +88,7 @@ public class ArrayDeque <T> {
         resize();
         return val;
     }
+    @Override
     public T removeLast() {
         if (size == 0) {
             return null;
@@ -97,6 +100,7 @@ public class ArrayDeque <T> {
         resize();
         return val;
     }
+    @Override
     public T get(int index) {
         if (index >= size || index < 0) {
             return null;
@@ -104,7 +108,7 @@ public class ArrayDeque <T> {
         int pos = checkBounds(first + 1 + index);
         return lst[pos];
     }
-
+    @Override
     public boolean equals(Object o) {
         if (o instanceof ArrayDeque && ((ArrayDeque) o).size() == size && equal_helper(this, (ArrayDeque) o)) {
             return true;
