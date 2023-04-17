@@ -48,6 +48,17 @@ public class ArrayDequeueTest {
         assertEquals(99, a.get(0));
         assertEquals(99, a.get(199));
         assertEquals(0, a.get(100));
+        a.printDeque();
 
+        for (int i = 0; i < 100; i += 1) {
+            a.removeLast();
+        }
+        a.printDeque();
+
+        for (int i = 0; i < 36; i += 1) {
+            a.removeFirst();
+        }
+        a.removeFirst();
+        a.printDeque();
     }
 }

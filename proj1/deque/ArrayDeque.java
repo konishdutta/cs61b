@@ -16,29 +16,50 @@ public class ArrayDeque <T> {
         lst[first] = item;
         first -= 1;
         size += 1;
-        checkBounds(); // method that loops the array around when needed
+        first = checkBounds(first); // method that loops the array around when needed
 
     }
 
-    public void checkBounds() {
-        if (last >= lst.length) {
-            last -= lst.length;
+    public int checkBounds(int val) {
+        if (val >= lst.length) {
+            val -= lst.length;
         }
-        else if (first < 0) {
-            first += lst.length;
+        else if (val < 0) {
+            val += lst.length;
         }
+        return val;
     }
     public void resize() {
+        /* create int vars to help with placement */
+        int oldLen = lst.length;
+        int newLen = oldLen;
+
         if (size == lst.length) {
-            upsize();
+            newLen = oldLen * 2;
         }
+
+        else if (size > 15 && size * 4 <= lst.length) {
+            newLen = oldLen / 2;
+        }
+
+        else if (oldLen == newLen) {
+            return;
+        }
+
+        T[] tmp = ((T[]) new Object[newLen]); //create a new Array with newLen
+        for (int i = 0; i < size; i += 1) {
+            tmp[i] = this.get(i);
+        }
+        first = newLen - 1;
+        last = size;
+        lst = tmp;
     }
     public void addLast(T item) {
         resize(); // method that checks resizing
         lst[last] = item;
         last += 1;
         size += 1;
-        checkBounds();
+        last = checkBounds(last);
     }
     public boolean isEmpty() {
         return size == 0;
@@ -58,60 +79,29 @@ public class ArrayDeque <T> {
         if (size == 0) {
             return null;
         }
-        T val = lst[first + 1];
+        T val = this.get(0);
         first += 1;
         size -= 1;
+        first = checkBounds(first);
+        resize();
         return val;
     }
     public T removeLast() {
         if (size == 0) {
             return null;
         }
-        T val = lst[last - 1];
+        T val = this.get(size - 1);
         last -= 1;
         size -= 1;
+        last = checkBounds(last);
+        resize();
         return val;
     }
-
-    private void upsize(){
-        /* create int vars to help with placement */
-        int oldLen = lst.length;
-        int newLen = oldLen * 2;
-
-        T[] tmp = ((T[]) new Object[newLen]); //create a new Array with double the length
-        /* copy the stuff in the front */
-        System.arraycopy(lst, 0, tmp, 0, last);
-        /* copy the stuff to the back */
-        System.arraycopy(lst, last, tmp, last + oldLen, oldLen - last);
-        first = last + oldLen - 1;
-        lst = tmp;
-    }
-
-    private void downsize(){
-        if (size > 0 && size * 4 <= lst.length) {
-            /* create int vars to help with placement */
-            int oldLen = lst.length;
-            int newLen = oldLen * 2;
-            int newMid = newLen / 2;
-            int sizeMid = size / 2;
-            int sizeMod = size % 2;
-
-            T[] tmp = ((T[]) new Object[newLen]); //create a new Array with double the length
-            System.arraycopy(lst, first + 1, tmp, newMid - sizeMid, size);
-            first = newMid - sizeMid - 1;
-            last = newMid + sizeMid + sizeMod;
-            lst = tmp;
-        }
-    }
-
     public T get(int index) {
         if (index >= size || index < 0) {
             return null;
         }
-        int pos = first + 1 + index;
-        if (pos > lst.length) {
-            pos -= lst.length;
-        }
+        int pos = checkBounds(first + 1 + index);
         return lst[pos];
     }
 
