@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 public class ArrayDequeueTest {
     @Test
-    public void ArrayListBasicTests() {
+    public void arrayListBasicTests() {
         ArrayDeque a = new ArrayDeque();
         assertEquals(a.isEmpty(), true);
         a.addFirst("hello");
@@ -31,7 +31,7 @@ public class ArrayDequeueTest {
     }
 
     @Test
-    public void HugeArrayTest() {
+    public void hugeArrayTest() {
         ArrayDeque a = new ArrayDeque();
         for (int i = 0; i < 100; i += 1) {
             a.addFirst(i);
