@@ -1,20 +1,15 @@
 package deque;
-
 import java.util.Iterator;
-
-public class LinkedListDeque <T> implements Deque <T> {
+public class LinkedListDeque <T> implements Deque <T>, Iterable<T> {
     private class Node {
         private T first;
         private Node rest;
-
         private Node last;
-
         private Node(T x, Node r, Node l){
             first = x;
             rest = r;
             last = l;
         }
-
         private T getNode(int index) {
             if (index == 0) {
                 return first;
@@ -26,7 +21,6 @@ public class LinkedListDeque <T> implements Deque <T> {
                 return rest.getNode(index - 1);
             }
         }
-
     }
     private int size;
     private Node sentinel;

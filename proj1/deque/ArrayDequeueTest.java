@@ -3,6 +3,7 @@ package deque;
 import org.junit.Test;
 
 import java.sql.Array;
+import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
@@ -37,9 +38,11 @@ public class ArrayDequeueTest {
     @Test
     public void HugeArrayTest() {
         ArrayDeque a = new ArrayDeque();
-        for (int i = 0; i < 100; i += 1) {
+        for (int i = 0; i < 440; i += 1) {
             a.addFirst(i);
         }
+
+        a.printDeque();
 
         for (int i = 0; i < 100; i += 1) {
             a.addLast(i);
@@ -60,5 +63,10 @@ public class ArrayDequeueTest {
         }
         a.removeFirst();
         a.printDeque();
+
+
+        for (Object x : a) {
+            System.out.println(x);
+        }
     }
 }
