@@ -1,6 +1,6 @@
 package deque;
 import java.util.Iterator;
-public class ArrayDeque <T> implements Deque <T>, Iterable<T> {
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] lst;
     private int size;
     private int first;
@@ -21,29 +21,24 @@ public class ArrayDeque <T> implements Deque <T>, Iterable<T> {
 
     }
 
-    public int checkBounds(int val) {
+    private int checkBounds(int val) {
         if (val >= lst.length) {
             val -= lst.length;
-        }
-        else if (val < 0) {
+        } else if (val < 0) {
             val += lst.length;
         }
         return val;
     }
-    public void resize() {
+    private void resize() {
         /* create int vars to help with placement */
         int oldLen = lst.length;
         int newLen = oldLen;
 
         if (size == lst.length) {
             newLen = oldLen * 2;
-        }
-
-        else if (size > 15 && size * 4 <= lst.length) {
+        } else if (size > 15 && size * 4 <= lst.length) {
             newLen = oldLen / 2;
-        }
-
-        else if (oldLen == newLen) {
+        } else if (oldLen == newLen) {
             return;
         }
 
@@ -108,27 +103,25 @@ public class ArrayDeque <T> implements Deque <T>, Iterable<T> {
         int pos = checkBounds(first + 1 + index);
         return lst[pos];
     }
-    @Override
     public boolean equals(Object o) {
-        if (o instanceof ArrayDeque && ((ArrayDeque) o).size() == size && equal_helper(this, (ArrayDeque) o)) {
-            return true;
+        if (o instanceof Deque) {
+            Deque other = (Deque) o;
+            int h = ((Deque) o).size();
+            if (h == this.size()) {
+                for (int i = 0; i < h; i += 1) {
+                    if (other.get(i) != this.get(i)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
         }
         return false;
-    }
-    private boolean equal_helper(ArrayDeque a, ArrayDeque b) {
-        int p = 0;
-        while (a.get(p) == b.get(p) && p < size) {
-            p += 1;
-        }
-        if (p == size) {
-            return true;
-        }
-        else return false;
     }
 
     private class DequeIterator implements Iterator<T> {
         private int p;
-        public DequeIterator() {
+        DequeIterator() {
             p = 0;
         }
         public boolean hasNext() {

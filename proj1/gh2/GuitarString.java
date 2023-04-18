@@ -1,7 +1,6 @@
 package gh2;
 import deque.ArrayDeque;
 import deque.Deque;
-import java.util.Random;
 
 //Note: This file will not compile until you complete the Deque implementations
 public class GuitarString {
