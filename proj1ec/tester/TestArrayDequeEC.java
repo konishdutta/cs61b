@@ -26,8 +26,6 @@ public class TestArrayDequeEC<Item> {
 
         assertEquals("isEmpty()", a.isEmpty(), b.isEmpty());
         assertEquals("size()", a.size(), b.size());
-        a.printDeque();
-        b.printDeque();
 
 
         for (int j = 0; j < 10000; j += 1) {
@@ -67,10 +65,6 @@ public class TestArrayDequeEC<Item> {
                 for (int i = 0; i < a.size(); i += 1) {
                     assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
                 }
-
-            } else if (func == 4) {
-                a.printDeque();
-                b.printDeque();
 
             } else if (func == 5) {
                 assertEquals("isEmpty()\n", a.isEmpty(), b.isEmpty());
