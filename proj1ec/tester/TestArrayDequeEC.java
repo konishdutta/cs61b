@@ -29,9 +29,9 @@ public class TestArrayDequeEC<Item> {
 
 
         for (int j = 0; j < 10000; j += 1) {
-            int func = StdRandom.uniform(8);
+            Integer func = StdRandom.uniform(8);
             if (func == 0) {
-                int randVal = StdRandom.uniform(1000);
+                Integer randVal = StdRandom.uniform(1000);
                 a.addFirst(randVal);
                 b.addFirst(randVal);
                 assertEquals("addFirst(" + randVal + ")\n", a.get(0), b.get(0));
@@ -40,7 +40,7 @@ public class TestArrayDequeEC<Item> {
                     assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
                 }
             } else if (func == 1) {
-                int randVal = StdRandom.uniform(1000);
+                Integer randVal = StdRandom.uniform(1000);
                 a.addLast(randVal);
                 b.addLast(randVal);
                 assertEquals("addLast(" + randVal + ")\n", a.get(a.size() - 1), b.get(b.size() - 1));
@@ -54,6 +54,7 @@ public class TestArrayDequeEC<Item> {
                 assertEquals("removeFirst()\n", x, y);
                 assertEquals("size()\n", a.size(), b.size());
                 if (a.size() > 0) {
+                    //assertEquals("removeFirst()\n", a.get(0), b.get(0));
                     for (int i = 0; i < a.size(); i += 1) {
                         assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
                     }
@@ -64,6 +65,7 @@ public class TestArrayDequeEC<Item> {
                 assertEquals("removeLast()\n", x, y);
                 assertEquals("size()\n", a.size(), b.size());
                 if (a.size() > 0) {
+                    //assertEquals("removeLast()\n", a.get(a.size() - 1), b.get(b.size() - 1));
                     for (int i = 0; i < a.size(); i += 1) {
                         assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
                     }
@@ -73,7 +75,7 @@ public class TestArrayDequeEC<Item> {
             } else if (func == 6) {
                 assertEquals("size()\n", a.size(), b.size());
             } else if (func == 7 && a.size() > 0 && b.size() > 0) {
-                int randVal = StdRandom.uniform(a.size());
+                Integer randVal = StdRandom.uniform(a.size());
                 assertEquals("get(" + randVal + ")\n", a.get(randVal), b.get(randVal));
                 assertEquals("size()\n", a.size(), b.size());
                 for (int i = 0; i < a.size(); i += 1) {
