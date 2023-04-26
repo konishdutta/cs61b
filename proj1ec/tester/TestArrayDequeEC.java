@@ -35,22 +35,39 @@ public class TestArrayDequeEC<Item> {
                 a.addFirst(randVal);
                 b.addFirst(randVal);
                 assertEquals("addFirst(" + randVal + ")\n", a.get(0), b.get(0));
+                assertEquals("size()\n", a.size(), b.size());
+                for (int i = 0; i < a.size(); i += 1) {
+                    assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
+                }
             } else if (func == 1) {
                 int randVal = StdRandom.uniform(1000);
                 a.addLast(randVal);
                 b.addLast(randVal);
                 assertEquals("addLast(" + randVal + ")\n", a.get(a.size() - 1), b.get(b.size() - 1));
-
+                assertEquals("size()\n", a.size(), b.size());
+                for (int i = 0; i < a.size(); i += 1) {
+                    assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
+                }
             } else if (func == 2 && a.size() > 0 && b.size() > 0) {
-                int x = a.removeFirst();
-                int y = b.removeFirst();
+                Integer x = a.removeFirst();
+                Integer y = b.removeFirst();
                 assertEquals("removeFirst()\n", x, y);
-
+                assertEquals("size()\n", a.size(), b.size());
+                if (a.size() > 0) {
+                    for (int i = 0; i < a.size(); i += 1) {
+                        assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
+                    }
+                }
             } else if (func == 3 && a.size() > 0 && b.size() > 0) {
-                int x = a.removeLast();
-                int y = b.removeLast();
+                Integer x = a.removeLast();
+                Integer y = b.removeLast();
                 assertEquals("removeLast()\n", x, y);
-
+                assertEquals("size()\n", a.size(), b.size());
+                if (a.size() > 0) {
+                    for (int i = 0; i < a.size(); i += 1) {
+                        assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
+                    }
+                }
             } else if (func == 5) {
                 assertEquals("isEmpty()\n", a.isEmpty(), b.isEmpty());
             } else if (func == 6) {
