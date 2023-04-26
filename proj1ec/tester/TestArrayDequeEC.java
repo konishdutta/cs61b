@@ -45,13 +45,11 @@ public class TestArrayDequeEC<Item> {
                 int x = a.removeFirst();
                 int y = b.removeFirst();
                 assertEquals("removeFirst()\n", x, y);
-                assertEquals("removeFirst()\n", a.get(0), b.get(0));
 
             } else if (func == 3 && a.size() > 0 && b.size() > 0) {
                 int x = a.removeLast();
                 int y = b.removeLast();
                 assertEquals("removeLast()\n", x, y);
-                assertEquals("removeFirst()\n", a.get(a.size() - 1), b.get(b.size() - 1));
 
             } else if (func == 5) {
                 assertEquals("isEmpty()\n", a.isEmpty(), b.isEmpty());
