@@ -34,7 +34,7 @@ public class TestArrayDequeEC<Item> {
                 int randVal = StdRandom.uniform(1000);
                 a.addFirst(randVal);
                 b.addFirst(randVal);
-                //assertEquals("addFirst(" + randVal + ")\n", a.get(0), b.get(0));
+                assertEquals("addFirst(" + randVal + ")\n", a.get(0), b.get(0));
                 assertEquals("size()\n", a.size(), b.size());
                 for (int i = 0; i < a.size(); i += 1) {
                     assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
@@ -43,7 +43,7 @@ public class TestArrayDequeEC<Item> {
                 int randVal = StdRandom.uniform(1000);
                 a.addLast(randVal);
                 b.addLast(randVal);
-                //assertEquals("addLast(" + randVal + ")\n", a.get(a.size() - 1), b.get(b.size() - 1));
+                assertEquals("addLast(" + randVal + ")\n", a.get(a.size() - 1), b.get(b.size() - 1));
                 assertEquals("size()\n", a.size(), b.size());
                 for (int i = 0; i < a.size(); i += 1) {
                     assertEquals("get(" + i + ")\n", a.get(i), b.get(i));
