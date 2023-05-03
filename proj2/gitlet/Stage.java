@@ -1,2 +1,4 @@
-package gitlet;public class Stage {
+package gitlet;
+
+public class Stage {
 }
