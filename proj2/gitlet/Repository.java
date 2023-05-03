@@ -29,7 +29,7 @@ public class Repository implements Serializable {
     public static HashMap<String, Commit> branchMapKV;
     public static HashMap<Commit, String> branchMapVK;
 
-    public void init() {
+    public static void init() {
         if (GITLET_DIR.exists()) {
             System.out.print("A Gitlet version-control system already exists in the current directory.");
             return;
@@ -50,8 +50,8 @@ public class Repository implements Serializable {
         saveRepo();
     }
 
-    public void saveRepo(){
-        writeObject(REPOSITORY_FILE, this);
+    public static void saveRepo(){
+        writeObject(REPOSITORY_FILE, Repository.class);
     }
 
 }
