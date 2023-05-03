@@ -1,11 +1,10 @@
 package gitlet;
 
-import com.google.common.collect.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 
 import static gitlet.Utils.*;
 
@@ -27,7 +26,8 @@ public class Repository implements Serializable {
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
     public static Commit head = null;
-    public static BiMap branchMap;
+    public static HashMap branchMapKV;
+    public static HashMap branchMapVK;
 
     public void init() {
         if (GITLET_DIR.exists()) {
@@ -45,7 +45,8 @@ public class Repository implements Serializable {
         COMMITS_DIR.mkdir();
         COMMITS_BLOBS_DIR.mkdir();
         Commit initialCommit = new Commit("initial commit", null, null, "master");
-        branchMap.put("master", initialCommit);
+        branchMapKV.put("master", initialCommit);
+        branchMapVK.put(initialCommit, "master");
         saveRepo();
     }
 
