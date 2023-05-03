@@ -26,8 +26,8 @@ public class Repository implements Serializable {
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
     public static Commit head = null;
-    public static HashMap branchMapKV;
-    public static HashMap branchMapVK;
+    public static HashMap<String, Commit> branchMapKV;
+    public static HashMap<Commit, String> branchMapVK;
 
     public void init() {
         if (GITLET_DIR.exists()) {
