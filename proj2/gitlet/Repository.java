@@ -3,8 +3,8 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
+import java.time.*;
+import java.util.*;
 
 import static gitlet.Utils.*;
 
@@ -26,8 +26,8 @@ public class Repository implements Serializable {
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
     public static Commit head = null;
-    public static HashMap<String, Commit> branchMapKV;
-    public static HashMap<Commit, String> branchMapVK;
+    public static HashMap<String, Commit> branchMapKV = new HashMap<String, Commit>();
+    public static HashMap<Commit, String> branchMapVK = new HashMap<Commit, String>();
 
     public static void init() {
         if (GITLET_DIR.exists()) {
@@ -44,10 +44,18 @@ public class Repository implements Serializable {
         STAGING_BLOBS_DIR.mkdir();
         COMMITS_DIR.mkdir();
         COMMITS_BLOBS_DIR.mkdir();
-        Commit initialCommit = new Commit("initial commit", null, null, "master");
-        branchMapKV.put("master", initialCommit);
-        branchMapVK.put(initialCommit, "master");
+        Commit initialCommit = new Commit("initial commit", Instant.EPOCH, null, "master");
+        updateBranchMap("master", initialCommit);
         saveRepo();
+    }
+
+    public static void updateBranchMap(String branch, Commit commit){
+        Commit tmp = branchMapKV.get(branch);
+        if (tmp != null) {
+            branchMapVK.remove(tmp);
+        }
+        branchMapKV.put(branch, commit);
+        branchMapVK.put(commit, branch);
     }
 
     public static void saveRepo(){
