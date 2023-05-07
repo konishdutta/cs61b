@@ -4,6 +4,7 @@ package gitlet;
 
 import java.io.*;
 import java.time.*;
+import java.time.format.*;
 import java.util.*;
 
 import static gitlet.Utils.*;
@@ -18,33 +19,27 @@ public class Commit implements Serializable {
     private String UID;
     private String message;
     private Instant timestamp;
-    private BlobTree blobs;
+    private BlobList blobs;
     private Commit parent;
     private String branch;
 
-    public Commit(String m, Instant ts, BlobTree b, String branch) {
+    public Commit(String m, Instant ts, BlobList blobs, String branch) {
         this.message = m;
         this.timestamp = ts;
         this.parent = Repository.head;
-        this.blobs = b;
-        generateUID();
-
-        /* change the head marker */
-        Repository.head = this;
-
-        /* change the branch */
+        this.blobs = blobs;
         this.branch = branch;
-        if(parent != null) {
-            parent.branch = null;
-        }
-
-        saveCommit(Repository.COMMITS_DIR);
+        generateUID();
     }
     private void generateUID() {
-        String arg3 = "null";
-        String arg4 = "null";
+        if (branch.equals("staging")) {
+            UID = "staging";
+            return;
+        }
+        String arg3 = "";
+        String arg4 = "";
         if (this.blobs != null) {
-            arg3 = this.blobs.UID;
+            arg3 = this.blobs.getUID();
         }
         if(this.parent != null) {
             arg4 = this.parent.UID;
@@ -52,7 +47,17 @@ public class Commit implements Serializable {
         this.UID = Utils.sha1(message, timestamp.toString(), arg3, arg4);
     }
 
-    private void saveCommit(File dir) {
+    public void updateMarker(){
+        /* change the head marker */
+        Repository.head = this;
+
+        /* change the parent branch */
+        if(parent != null) {
+            parent.branch = null;
+        }
+    }
+
+    public void saveCommit(File dir) {
         File destination = join(dir, this.UID);
         if(!destination.exists()) {
             try {
@@ -63,6 +68,62 @@ public class Commit implements Serializable {
         }
         writeObject(destination, this);
     }
+    public BlobList getBlobs(){
+        if (this.blobs == null) {
+            return new BlobList();
+        }
+        return this.blobs;
+    }
+    public String getUID() {
+        return this.UID;
+    }
+    public String getTimestamp() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy Z").withZone(ZoneId.systemDefault());
+        return formatter.format(this.timestamp);
+    }
+    public String getMessage() {
+        return this.message;
+    }
+    public Commit getParent() {
+        return this.parent;
+    }
+    public void prettyPrint() {
+        System.out.println("===");
+        System.out.println("commit " + this.getUID());
+        System.out.println("Date: " + this.getTimestamp());
+        System.out.println(this.getMessage());
+        System.out.println();
+        //TODO Merge
+    }
+    public void printCommit() {
+        prettyPrint();
+        if (this.parent == null) {
+            return;
+        }
+        this.parent.printCommit();
+    }
 
+    public void updateParent(Commit p) {
+        this.parent = p;
+    }
+    public String getBranch(){
+        return branch;
+    }
+
+    public int size(){
+        return blobs.getSet().size();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Commit)) {
+            return false;
+        }
+        Commit c = (Commit) obj;
+        return this.getBlobs().getSet().keySet().equals(c.getBlobs().getSet().keySet());
+    }
 
 }

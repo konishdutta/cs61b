@@ -18,10 +18,41 @@ public class Main {
             case "init":
                 Repository.init();
                 break;
-            case "add":
-                // TODO: handle the `add [filename]` command
+            case "log":
+                Repository.log();
                 break;
-            // TODO: FILL THE REST IN
+            case "add":
+                if (!Repository.checkFileExists(args[1])) {
+                    System.out.println("File does not exist.");
+                    System.exit(0);
+                }
+                Repository.add(args[1]);
+                break;
+            case "commit":
+                if (args.length == 1) {
+                    System.out.println("Please enter a commit message.");
+                    System.exit(0);
+                }
+                Repository.commit(args[1]);
+                break;
+            case "rm":
+                Repository.remove(args[1]);
+                break;
+            case "global-log":
+                Repository.globalLog();
+                break;
+            case "find":
+                Repository.find(args[1]);
+                break;
+            case "status":
+                Repository.status();
+                break;
+            case "debug":
+                Repository.loadRepo();
+                Repository.loadStage();
+                System.out.println(Repository.head.getBlobs().getSet());
+                System.out.println(Repository.stage.getBlobs().getSet());
+                break;
             default:
                 System.out.print("No command with that name exists.");
                 System.exit(0);
