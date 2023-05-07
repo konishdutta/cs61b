@@ -7,7 +7,7 @@ import java.io.Serializable;
 import static gitlet.Utils.join;
 import static gitlet.Utils.writeObject;
 
-public class Blob implements Serializable {
+public class Blob implements Serializable, Comparable<Blob> {
     private String UID;
     private String contents;
     private String name;
@@ -44,5 +44,9 @@ public class Blob implements Serializable {
         writeObject(destination, this);
     }
 
+    @Override
+    public int compareTo(Blob o) {
+        return this.getName().compareTo(o.getName());
+    }
 }
 

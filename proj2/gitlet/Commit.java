@@ -15,7 +15,7 @@ import static gitlet.Utils.*;
  *
  *  @author TODO
  */
-public class Commit implements Serializable {
+public class Commit implements Serializable, Comparable<Commit> {
     private String UID;
     private String message;
     private Instant timestamp;
@@ -126,4 +126,8 @@ public class Commit implements Serializable {
         return this.getBlobs().getSet().keySet().equals(c.getBlobs().getSet().keySet());
     }
 
+    @Override
+    public int compareTo(Commit o) {
+        return this.getTimestamp().compareTo(o.getTimestamp());
+    }
 }
