@@ -31,8 +31,8 @@ public class Repository implements Serializable {
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
     public static Commit head = null;
-    public static HashMap<String, Commit> branchMapKV = new HashMap<String, Commit>();
-    public static HashMap<Commit, String> branchMapVK = new HashMap<Commit, String>();
+    public static TreeMap<String, Commit> branchMapKV = new TreeMap<String, Commit>();
+    public static TreeMap<Commit, String> branchMapVK = new TreeMap<Commit, String>();
     public static Stage stage = null;
 
     public static void init() {
@@ -175,8 +175,8 @@ public class Repository implements Serializable {
 
     public static void loadRepo() {
         head = readObject(HEAD_FILE, Commit.class);
-        branchMapKV = readObject(MAP_STRING_COMMIT, HashMap.class);
-        branchMapVK = readObject(MAP_COMMIT_STRING, HashMap.class);
+        branchMapKV = readObject(MAP_STRING_COMMIT, TreeMap.class);
+        branchMapVK = readObject(MAP_COMMIT_STRING, TreeMap.class);
     }
 
     public static boolean checkFileExists(String f) {
@@ -238,8 +238,8 @@ public class Repository implements Serializable {
         System.out.println("=== Staged Files ===");
         Set add = stage.getAddFiles();
         Set remove = stage.getRemoveFiles();
-        HashMap<String, String> blobs = head.getBlobs().getFileSet();
-        HashMap<String, String> stageBlobs = stage.getBlobs().getFileSet();
+        TreeMap<String, String> blobs = head.getBlobs().getFileSet();
+        TreeMap<String, String> stageBlobs = stage.getBlobs().getFileSet();
         for (Object f : add) {
             System.out.println(f);
         }

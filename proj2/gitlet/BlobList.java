@@ -7,8 +7,8 @@ import java.util.*;
 import static gitlet.Utils.plainFilenamesIn;
 
 public class BlobList implements Serializable {
-    private HashMap<String, Blob> blobs = new HashMap<String, Blob>();
-    private HashMap<String, String> fileMap = new HashMap<String, String>();
+    private TreeMap<String, Blob> blobs = new TreeMap<String, Blob>();
+    private TreeMap<String, String> fileMap = new TreeMap<String, String>();
     private String UID;
     public BlobList(){
         UID = "";
@@ -17,10 +17,10 @@ public class BlobList implements Serializable {
         generateUID();
         return UID;
     }
-    public HashMap<String, Blob> getSet(){
+    public TreeMap<String, Blob> getSet(){
         return blobs;
     }
-    public HashMap<String, String> getFileSet(){
+    public TreeMap<String, String> getFileSet(){
         return fileMap;
     }
     public Set<String> getFileKeys(){
