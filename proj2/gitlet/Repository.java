@@ -30,10 +30,11 @@ public class Repository implements Serializable {
     public static final File STAGING_BLOBS_DIR = join(STAGING_DIR, "blobs");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
+    public static final File CURRENT_BRANCH = join(GITLET_DIR, "CURRENT_BRANCH");
     public static Commit head = null;
-    public static TreeMap<String, Commit> branchMapKV = new TreeMap<String, Commit>();
-    public static TreeMap<Commit, String> branchMapVK = new TreeMap<Commit, String>();
+    public static TreeMap<String, Branch> branchMapKV = new TreeMap<String, Branch>();
     public static Stage stage = null;
+    public static Branch currentBranch;
 
     public static void init() {
         /* make all the files */
@@ -62,15 +63,29 @@ public class Repository implements Serializable {
         COMMITS_DIR.mkdir();
         COMMITS_BLOBS_DIR.mkdir();
 
-        Commit initialCommit = new Commit("initial commit", Instant.EPOCH, new BlobList(), "master");
-        initialCommit.updateMarker();
+        Commit initialCommit = new Commit("initial commit", Instant.EPOCH, new BlobList());
         initialCommit.saveCommit(Repository.COMMITS_DIR);
 
-        updateBranchMap("master", initialCommit);
+        updateMarker(initialCommit);
+        Branch masterBranch = new Branch(initialCommit, "master");
+        updateBranchMap("master", masterBranch);
+        currentBranch = masterBranch;
         saveRepo();
         System.exit(0);
     }
-
+    public static void addBranch(String label){
+        loadRepo();
+        if (branchMapKV.containsKey(label)) {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
+        Branch newBranch = new Branch(head, label);
+        updateBranchMap(label, newBranch);
+        saveRepo();
+    }
+    public static void updateMarker(Commit c) {
+        head = c;
+    }
     public static void commit(String m) {
         /* takes everything in the staging area and commits it */
         loadRepo();
@@ -79,10 +94,10 @@ public class Repository implements Serializable {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
-        Commit newCommit = new Commit(m, Instant.now(), stage.getBlobs(), head.getBranch());
-        newCommit.updateMarker();
+        Commit newCommit = new Commit(m, Instant.now(), stage.getBlobs());
+        updateMarker(newCommit);
         newCommit.saveCommit(Repository.COMMITS_DIR);
-        updateBranchMap(head.getBranch(), newCommit);
+        currentBranch.push(newCommit);
         commitStagedBlobs();
         saveRepo();
         System.exit(0);
@@ -124,13 +139,8 @@ public class Repository implements Serializable {
         }
     }
 
-    public static void updateBranchMap(String branch, Commit commit) {
-        Commit tmp = branchMapKV.get(branch);
-        if (tmp != null) {
-            branchMapVK.remove(tmp);
-        }
-        branchMapKV.put(branch, commit);
-        branchMapVK.put(commit, branch);
+    public static void updateBranchMap(String label, Branch branch) {
+        branchMapKV.put(label, branch);
     }
 
     public static void log() {
@@ -170,17 +180,17 @@ public class Repository implements Serializable {
     public static void saveRepo() {
         writeObject(HEAD_FILE, head);
         writeObject(MAP_STRING_COMMIT, branchMapKV);
-        writeObject(MAP_COMMIT_STRING, branchMapVK);
+        writeObject(CURRENT_BRANCH, currentBranch);
     }
 
     public static void loadRepo() {
         head = readObject(HEAD_FILE, Commit.class);
         branchMapKV = readObject(MAP_STRING_COMMIT, TreeMap.class);
-        branchMapVK = readObject(MAP_COMMIT_STRING, TreeMap.class);
+        currentBranch = readObject(CURRENT_BRANCH, Branch.class);
     }
 
     public static void loadBranch(String b) {
-        head = branchMapKV.get(b);
+        currentBranch = branchMapKV.get(b);
     }
 
     public static boolean checkFileExists(String f) {
@@ -233,7 +243,7 @@ public class Repository implements Serializable {
         System.out.println("=== Branches ===");
         for (String branch : branchMapKV.keySet()) {
             String marker = "";
-            if (head.getBranch().equals(branch)) {
+            if (currentBranch.getName().equals(branch)) {
                 marker = "*";
             }
             System.out.println(marker + branch);

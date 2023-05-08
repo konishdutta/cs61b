@@ -21,18 +21,16 @@ public class Commit implements Serializable, Comparable<Commit> {
     private Instant timestamp;
     private BlobList blobs;
     private Commit parent;
-    private String branch;
 
-    public Commit(String m, Instant ts, BlobList blobs, String branch) {
+    public Commit(String m, Instant ts, BlobList blobs) {
         this.message = m;
         this.timestamp = ts;
         this.parent = Repository.head;
         this.blobs = blobs;
-        this.branch = branch;
         generateUID();
     }
     private void generateUID() {
-        if (branch.equals("staging")) {
+        if (this instanceof Stage) {
             UID = "staging";
             return;
         }
@@ -45,16 +43,6 @@ public class Commit implements Serializable, Comparable<Commit> {
             arg4 = this.parent.UID;
         }
         this.UID = Utils.sha1(message, timestamp.toString(), arg3, arg4);
-    }
-
-    public void updateMarker(){
-        /* change the head marker */
-        Repository.head = this;
-
-        /* change the parent branch */
-        if(parent != null) {
-            parent.branch = null;
-        }
     }
 
     public void saveCommit(File dir) {
@@ -105,9 +93,6 @@ public class Commit implements Serializable, Comparable<Commit> {
 
     public void updateParent(Commit p) {
         this.parent = p;
-    }
-    public String getBranch(){
-        return branch;
     }
 
     public int size(){

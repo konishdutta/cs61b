@@ -50,8 +50,9 @@ public class Main {
             case "debug":
                 Repository.loadRepo();
                 Repository.loadStage();
-                System.out.println(Repository.head.getBlobs().getSet());
-                System.out.println(Repository.stage.getBlobs().getSet());
+                System.out.println("Head: " + Repository.head.getBlobs().getSet());
+                System.out.println("Stage: " + Repository.stage.getBlobs().getSet());
+                System.out.println("Branches: " + Repository.branchMapKV);
                 break;
             case "checkout":
                 Repository.loadRepo();
@@ -62,6 +63,9 @@ public class Main {
                 } else if (args.length == 4) {
                     Repository.commitFileCheck(args[1], args[3]);
                 }
+                break;
+            case "branch":
+                Repository.addBranch(args[1]);
                 break;
             default:
                 System.out.print("No command with that name exists.");

@@ -8,7 +8,7 @@ public class Stage extends Commit {
     private HashSet<String> addFiles;
     private HashSet<String> removeFiles;
     public Stage(Commit head) {
-        super("stage", Instant.now(), head.getBlobs(), "staging");
+        super("stage", Instant.now(), head.getBlobs());
         addFiles = new HashSet<String>();
         removeFiles = new HashSet<String>();
         saveCommit(Repository.STAGING_DIR);
