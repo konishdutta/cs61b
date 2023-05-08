@@ -54,10 +54,11 @@ public class Main {
                 System.out.println(Repository.stage.getBlobs().getSet());
                 break;
             case "checkout":
+                Repository.loadRepo();
                 if (args.length == 2) {
                     Repository.branchCheck(args[1]);
                 } else if (args.length == 3) {
-                    Repository.fileCheck(args[2]);
+                    Repository.commitFileCheck(Repository.head.getUID(), args[2]);
                 } else if (args.length == 4) {
                     Repository.commitFileCheck(args[1], args[3]);
                 }

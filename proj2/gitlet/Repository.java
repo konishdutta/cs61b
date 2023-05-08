@@ -282,7 +282,6 @@ public class Repository implements Serializable {
     }
 
     public static void branchCheck(String b) {
-        loadRepo();
         if(!branchMapKV.containsKey(b)) {
             System.out.println("No such branch exists;");
             System.exit(0);
@@ -290,9 +289,10 @@ public class Repository implements Serializable {
         loadBranch(b);
         //TODO
     }
-    public static void fileCheck(String f) {
-        loadRepo();
-        BlobList headBlobs = head.getBlobs();
+    public static void commitFileCheck(String c, String f) {
+        File commitFile = Utils.join(COMMITS_DIR, c);
+        Commit commit = readObject(commitFile, Commit.class);
+        BlobList headBlobs = commit.getBlobs();
         if (!headBlobs.containsFileByName(f)) {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
@@ -301,8 +301,5 @@ public class Repository implements Serializable {
         String replaceBlobName = headBlobs.returnFileUIDByName(f);
         Blob replaceBlob = headBlobs.returnBlob(replaceBlobName);
         writeContents(fileLocation, replaceBlob.getContents());
-    }
-    public static void commitFileCheck(String c, String f) {
-
     }
 }
