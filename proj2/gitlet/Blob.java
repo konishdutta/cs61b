@@ -9,12 +9,12 @@ import static gitlet.Utils.writeObject;
 
 public class Blob implements Serializable, Comparable<Blob> {
     private String UID;
-    private String contents;
+    private byte[] contents;
     private String name;
 
     public Blob(File f) {
         name = f.getName();
-        contents = Utils.readContentsAsString(f);
+        contents = Utils.readContents(f);
         generateUID();
     }
     public String getUID() {
@@ -42,6 +42,10 @@ public class Blob implements Serializable, Comparable<Blob> {
             }
         }
         writeObject(destination, this);
+    }
+
+    public byte[] getContents() {
+        return contents;
     }
 
     @Override

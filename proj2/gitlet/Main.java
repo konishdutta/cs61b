@@ -53,6 +53,15 @@ public class Main {
                 System.out.println(Repository.head.getBlobs().getSet());
                 System.out.println(Repository.stage.getBlobs().getSet());
                 break;
+            case "checkout":
+                if (args.length == 2) {
+                    Repository.branchCheck(args[1]);
+                } else if (args.length == 3) {
+                    Repository.fileCheck(args[2]);
+                } else if (args.length == 4) {
+                    Repository.commitFileCheck(args[1], args[3]);
+                }
+                break;
             default:
                 System.out.print("No command with that name exists.");
                 System.exit(0);

@@ -179,6 +179,10 @@ public class Repository implements Serializable {
         branchMapVK = readObject(MAP_COMMIT_STRING, TreeMap.class);
     }
 
+    public static void loadBranch(String b) {
+        head = branchMapKV.get(b);
+    }
+
     public static boolean checkFileExists(String f) {
         File file = join(CWD, f);
         if (!file.exists()) {
@@ -275,5 +279,30 @@ public class Repository implements Serializable {
         System.out.println(modString);
         System.out.println("=== Untracked Files ===");
         System.out.println(untrackedString);
+    }
+
+    public static void branchCheck(String b) {
+        loadRepo();
+        if(!branchMapKV.containsKey(b)) {
+            System.out.println("No such branch exists;");
+            System.exit(0);
+        }
+        loadBranch(b);
+        //TODO
+    }
+    public static void fileCheck(String f) {
+        loadRepo();
+        BlobList headBlobs = head.getBlobs();
+        if (!headBlobs.containsFileByName(f)) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+        File fileLocation = Utils.join(CWD, f);
+        String replaceBlobName = headBlobs.returnFileUIDByName(f);
+        Blob replaceBlob = headBlobs.returnBlob(replaceBlobName);
+        writeContents(fileLocation, replaceBlob.getContents());
+    }
+    public static void commitFileCheck(String c, String f) {
+
     }
 }

@@ -52,9 +52,16 @@ public class BlobList implements Serializable {
     public boolean containsFile(Blob b) {
         return fileMap.containsKey(b.getName());
     }
+    public boolean containsFileByName(String b) {
+        return fileMap.containsKey(b);
+    }
 
     public String returnFileUID(Blob b) {
         return fileMap.get(b.getName());
+    }
+
+    public String returnFileUIDByName(String b) {
+        return fileMap.get(b);
     }
 
     public Blob returnBlob(String b) {
