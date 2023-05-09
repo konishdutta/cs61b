@@ -15,14 +15,21 @@ public class Branch implements Serializable {
     public Branch(Commit c, String n) {
         branchStack.push(c);
         name = n;
+        Repository.updateBranchMap(n, this);
     }
     public Commit peek(){
         return branchStack.peek();
     }
     public void push(Commit c) {
         branchStack.push(c);
+        Repository.updateBranchMap(this.name, this);
     }
     public String getName() {
-        return this.getName();
+        return this.name;
+    }
+
+    @Override
+    public String toString() {
+        return branchStack.toString();
     }
 }

@@ -68,10 +68,8 @@ public class Repository implements Serializable {
 
         updateMarker(initialCommit);
         Branch masterBranch = new Branch(initialCommit, "master");
-        updateBranchMap("master", masterBranch);
         currentBranch = masterBranch;
         saveRepo();
-        System.exit(0);
     }
     public static void addBranch(String label){
         loadRepo();
@@ -80,9 +78,23 @@ public class Repository implements Serializable {
             System.exit(0);
         }
         Branch newBranch = new Branch(head, label);
-        updateBranchMap(label, newBranch);
         saveRepo();
     }
+
+    public static void removeBranch(String label){
+        loadRepo();
+        if (label.equals(currentBranch.getName())) {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+        if (!branchMapKV.containsKey(label)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        branchMapKV.remove(label);
+        saveRepo();
+    }
+
     public static void updateMarker(Commit c) {
         head = c;
     }
@@ -189,10 +201,6 @@ public class Repository implements Serializable {
         currentBranch = readObject(CURRENT_BRANCH, Branch.class);
     }
 
-    public static void loadBranch(String b) {
-        currentBranch = branchMapKV.get(b);
-    }
-
     public static boolean checkFileExists(String f) {
         File file = join(CWD, f);
         if (!file.exists()) {
@@ -208,6 +216,15 @@ public class Repository implements Serializable {
             File stagedBlob = join(STAGING_BLOBS_DIR, b);
             File destination = join(COMMITS_BLOBS_DIR, b);
             stagedBlob.renameTo(destination);
+        }
+        stage = new Stage(head);
+    }
+    /* clear staging without saving blobs */
+    public static void clearStaging() {
+        List<String> newBlobs = plainFilenamesIn(STAGING_BLOBS_DIR);
+        for (String b : newBlobs) {
+            File stagedFile = join(STAGING_BLOBS_DIR, b);
+            stagedFile.delete();
         }
         stage = new Stage(head);
     }
@@ -290,14 +307,33 @@ public class Repository implements Serializable {
         System.out.println("=== Untracked Files ===");
         System.out.println(untrackedString);
     }
-
+    public static void clearCWD() {
+        List<String> files = plainFilenamesIn(CWD);
+        for (String f : files) {
+            File deleteTarget = Utils.join(CWD, f);
+            restrictedDelete(deleteTarget);
+        }
+    }
     public static void branchCheck(String b) {
         if(!branchMapKV.containsKey(b)) {
-            System.out.println("No such branch exists;");
+            System.out.println("No such branch exists.");
             System.exit(0);
         }
-        loadBranch(b);
-        //TODO
+        // make the checkout branch the current branch
+        currentBranch = branchMapKV.get(b);
+        // make the head the last branch in the current branch
+        head = currentBranch.peek();
+        // clear the staging area and CWD
+        clearStaging();
+        clearCWD();
+        // replace all the files
+        TreeMap<String, Blob> blobMap = head.getBlobs().getSet();
+        for (String UID : blobMap.keySet()) {
+            Blob newBlob = blobMap.get(UID);
+            File fileLocation = Utils.join(CWD, newBlob.getName());
+            writeContents(fileLocation, newBlob.getContents());
+        }
+        saveRepo();
     }
     public static void commitFileCheck(String c, String f) {
         File commitFile = Utils.join(COMMITS_DIR, c);

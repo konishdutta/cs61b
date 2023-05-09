@@ -68,4 +68,8 @@ public class BlobList implements Serializable {
         return blobs.get(b);
     }
 
+    @Override
+    public String toString() {
+        return fileMap.toString();
+    }
 }

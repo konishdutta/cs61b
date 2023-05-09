@@ -115,4 +115,8 @@ public class Commit implements Serializable, Comparable<Commit> {
     public int compareTo(Commit o) {
         return this.getTimestamp().compareTo(o.getTimestamp());
     }
+    @Override
+    public String toString() {
+        return getBlobs().toString();
+    }
 }
