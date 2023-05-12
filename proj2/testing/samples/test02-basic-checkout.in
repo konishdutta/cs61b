@@ -11,3 +11,10 @@
 > checkout -- wug.txt
 <<<
 = wug.txt wug.txt
+> commit "another try"
+No changes added to the commit.
+<<<
++ notwug.txt notwug.txt
+> commit "yet another"
+No changes added to the commit.
+<<<

@@ -1,7 +1,5 @@
 package gitlet;
 
-// TODO: any imports you need here
-
 import java.io.*;
 import java.time.*;
 import java.time.format.*;
@@ -10,10 +8,9 @@ import java.util.*;
 import static gitlet.Utils.*;
 
 /** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author kdutta
  */
 public class Commit implements Serializable, Comparable<Commit> {
     private String UID;
@@ -81,7 +78,6 @@ public class Commit implements Serializable, Comparable<Commit> {
         System.out.println("Date: " + this.getTimestamp());
         System.out.println(this.getMessage());
         System.out.println();
-        //TODO Merge
     }
     public void printCommit() {
         prettyPrint();
@@ -98,7 +94,6 @@ public class Commit implements Serializable, Comparable<Commit> {
     public int size(){
         return blobs.getSet().size();
     }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -108,7 +103,7 @@ public class Commit implements Serializable, Comparable<Commit> {
             return false;
         }
         Commit c = (Commit) obj;
-        return this.getBlobs().getSet().keySet().equals(c.getBlobs().getSet().keySet());
+        return this.UID.equals(c.UID);
     }
 
     @Override
@@ -117,6 +112,7 @@ public class Commit implements Serializable, Comparable<Commit> {
     }
     @Override
     public String toString() {
-        return getBlobs().toString();
+        return "UID: " + getUID() + "\nBlobs: " + getBlobs().toString();
     }
+
 }

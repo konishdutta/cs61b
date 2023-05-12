@@ -4,17 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
-import static gitlet.Utils.join;
-import static gitlet.Utils.writeObject;
+import static gitlet.Utils.*;
 
 public class Blob implements Serializable, Comparable<Blob> {
     private String UID;
     private byte[] contents;
     private String name;
+    private File file;
 
     public Blob(File f) {
-        name = f.getName();
-        contents = Utils.readContents(f);
+        this.name = f.getName();
+        this.contents = Utils.readContents(f);
+        this.file = f;
         generateUID();
     }
     public String getUID() {
@@ -48,9 +49,29 @@ public class Blob implements Serializable, Comparable<Blob> {
         return contents;
     }
 
+    public File getFile() {
+        return this.file;
+    }
+
     @Override
     public int compareTo(Blob o) {
         return this.getName().compareTo(o.getName());
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof Blob)) {
+            return false;
+        }
+        Blob c = (Blob) obj;
+        return this.UID.equals(c.UID);
+    }
+    @Override
+    public String toString() {
+        String res = readContentsAsString(file);
+        return res;
     }
 }
 

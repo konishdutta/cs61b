@@ -45,6 +45,13 @@ public class BlobList implements Serializable {
         fileMap.remove(name);
     }
 
+    public void removeBlobByFilename(String b) {
+        String name = b;
+        String UID = fileMap.get(name);
+        blobs.remove(UID);
+        fileMap.remove(name);
+    }
+
     public boolean contains(Blob b) {
         return blobs.containsKey(b.getUID());
     }
@@ -64,12 +71,35 @@ public class BlobList implements Serializable {
         return fileMap.get(b);
     }
 
+    public Blob returnBlobByName(String b) {
+        String fileUID = fileMap.get(b);
+        if (fileUID == null) {
+            return null;
+        } else {
+            return blobs.get(fileUID);
+        }
+    }
+
     public Blob returnBlob(String b) {
         return blobs.get(b);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof BlobList)) {
+            return false;
+        }
+        BlobList c = (BlobList) obj;
+        return this.blobs.equals(c.blobs);
     }
 
     @Override
     public String toString() {
         return fileMap.toString();
     }
+
+
 }

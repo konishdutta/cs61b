@@ -33,7 +33,7 @@ public class Main {
                     System.out.println("Please enter a commit message.");
                     System.exit(0);
                 }
-                Repository.commit(args[1]);
+                Repository.commit(args[1], "Commit");
                 break;
             case "rm":
                 Repository.remove(args[1]);
@@ -66,6 +66,15 @@ public class Main {
                 break;
             case "branch":
                 Repository.addBranch(args[1]);
+                break;
+            case "rm-branch":
+                Repository.removeBranch(args[1]);
+                break;
+            case "reset":
+                Repository.reset(args[1]);
+                break;
+            case "merge":
+                Repository.mergeOrchestrator(args[1]);
                 break;
             default:
                 System.out.print("No command with that name exists.");

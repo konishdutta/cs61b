@@ -9,13 +9,11 @@ import java.util.*;
 import static gitlet.Utils.*;
 import static gitlet.Utils.restrictedDelete;
 
-// TODO: any imports you need here
 
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
  *  does at a high level.
  *
- *  @author TODO
+ *  @author kdutta
  */
 public class Repository implements Serializable {
     public static final File CWD = new File(System.getProperty("user.dir"));
@@ -31,8 +29,10 @@ public class Repository implements Serializable {
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
     public static final File CURRENT_BRANCH = join(GITLET_DIR, "CURRENT_BRANCH");
+    public static final File COMMIT_ABBREV = join(GITLET_DIR, "COMMIT_ABBREV");
     public static Commit head = null;
     public static TreeMap<String, Branch> branchMapKV = new TreeMap<String, Branch>();
+    public static TreeMap<String, String> commitAbbrev = new TreeMap<String, String>();
     public static Stage stage = null;
     public static Branch currentBranch;
 
@@ -65,11 +65,20 @@ public class Repository implements Serializable {
 
         Commit initialCommit = new Commit("initial commit", Instant.EPOCH, new BlobList());
         initialCommit.saveCommit(Repository.COMMITS_DIR);
-
+        abbreviateCommit(initialCommit);
         updateMarker(initialCommit);
         Branch masterBranch = new Branch(initialCommit, "master");
         currentBranch = masterBranch;
         saveRepo();
+    }
+    public static void abbreviateCommit(Commit c) {
+        String UID = c.getUID();
+        String abbrev = UID.substring(0, 6);
+        if (commitAbbrev.containsKey(abbrev)) {
+            commitAbbrev.put(abbrev, "collision");
+        } else {
+            commitAbbrev.put(abbrev, UID);
+        }
     }
     public static void addBranch(String label){
         loadRepo();
@@ -98,36 +107,53 @@ public class Repository implements Serializable {
     public static void updateMarker(Commit c) {
         head = c;
     }
-    public static void commit(String m) {
+    public static void commit(String m, String type) {
         /* takes everything in the staging area and commits it */
         loadRepo();
         loadStage();
-        if (stage.equals(head)) {
+        if (stage.getBlobs().equals(head.getBlobs())) {
             System.out.println("No changes added to the commit.");
             System.exit(0);
         }
-        Commit newCommit = new Commit(m, Instant.now(), stage.getBlobs());
+        Commit newCommit = null;
+        if (type.equals("Commit")) {
+            newCommit = createCommit(m);
+        } else if (type.equals("Merge")) {
+            newCommit = createMerge(m);
+        }
         updateMarker(newCommit);
         newCommit.saveCommit(Repository.COMMITS_DIR);
+        abbreviateCommit(newCommit);
         currentBranch.push(newCommit);
         commitStagedBlobs();
         saveRepo();
-        System.exit(0);
+    }
+
+    public static Commit createCommit(String m) {
+        Commit newCommit = new Commit(m, Instant.now(), stage.getBlobs());
+        return newCommit;
+    }
+
+    public static Merge createMerge(String m) {
+        Merge newCommit = new Merge(m);
+        return newCommit;
     }
 
     public static void remove(String f) {
         loadRepo();
         loadStage();
         File file = Utils.join(CWD, f);
-        Blob b = new Blob(file);
-        /* check if file is staged and remove */
-        if (stage.getBlobs().containsFile(b)) {
-            deleteStagedBlob(b);
-            stage.getBlobs().removeBlobByFile(b);
+        if (file.exists()) {
+            Blob b = new Blob(file);
             Utils.restrictedDelete(file);
-            stage.unstage(b.getName());
-            if (head.getBlobs().contains(b)) {
-                stage.remove(b.getName());
+            deleteStagedBlob(b);
+        }
+        /* check if file is staged and remove */
+        if (stage.getBlobs().containsFileByName(f)) {
+            stage.getBlobs().removeBlobByFilename(f);
+            stage.unstage(f);
+            if (head.getBlobs().containsFileByName(f)) {
+                stage.remove(f);
             }
             stage.saveCommit(STAGING_DIR);
         } else {
@@ -169,7 +195,7 @@ public class Repository implements Serializable {
 
         BlobList stagedBlobs = stage.getBlobs();
         if (stagedBlobs.contains(b) && stagedBlobs.containsFile(b)) {
-            System.exit(0);
+            return;
         }
         if (stagedBlobs.containsFile(b)) {
             String duplicateBlobName = stagedBlobs.returnFileUID(b);
@@ -180,25 +206,26 @@ public class Repository implements Serializable {
         if (head.getBlobs().contains(b)) {
             stagedBlobs.addBlob(b);
             stage.saveCommit(STAGING_DIR);
-            System.exit(0);
+            return;
         }
         stagedBlobs.addBlob(b);
         stage.add(b.getName());
         stage.saveCommit(STAGING_DIR);
         b.saveBlob(STAGING_BLOBS_DIR);
-        System.exit(0);
     }
 
     public static void saveRepo() {
         writeObject(HEAD_FILE, head);
         writeObject(MAP_STRING_COMMIT, branchMapKV);
         writeObject(CURRENT_BRANCH, currentBranch);
+        writeObject(COMMIT_ABBREV, commitAbbrev);
     }
 
     public static void loadRepo() {
         head = readObject(HEAD_FILE, Commit.class);
         branchMapKV = readObject(MAP_STRING_COMMIT, TreeMap.class);
         currentBranch = readObject(CURRENT_BRANCH, Branch.class);
+        commitAbbrev = readObject(COMMIT_ABBREV, TreeMap.class);
     }
 
     public static boolean checkFileExists(String f) {
@@ -298,7 +325,8 @@ public class Repository implements Serializable {
             }
         }
         for (String f : head.getBlobs().getFileKeys()) {
-            if(!KonishAlgos.binSearch(f, files)) {
+            if(!KonishAlgos.binSearch(f, files) && !remove.contains(f)) {
+                // TO DO: make sure it's not in deleted
                 modString += f + " (deleted)\n";
             }
         }
@@ -314,6 +342,21 @@ public class Repository implements Serializable {
             restrictedDelete(deleteTarget);
         }
     }
+
+    public static String checkShortenedCommit(String c) {
+        if (c.length() != 6) {
+            return c;
+        }
+        if (!commitAbbrev.containsKey(c)) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        } else if (commitAbbrev.get(c).equals("collision")) {
+            System.out.println("Abbreviated commit has duplicates. Please use full commit UID");
+            System.exit(0);
+        }
+        return commitAbbrev.get(c);
+    }
+
     public static void branchCheck(String b) {
         if(!branchMapKV.containsKey(b)) {
             System.out.println("No such branch exists.");
@@ -323,11 +366,27 @@ public class Repository implements Serializable {
         currentBranch = branchMapKV.get(b);
         // make the head the last branch in the current branch
         head = currentBranch.peek();
+        saveRepo();
         // clear the staging area and CWD
+        reset(head.getUID());
+    }
+    public static Commit loadCommit(String c) {
+        File commitFile = Utils.join(COMMITS_DIR, c);
+        if (!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        Commit commit = readObject(commitFile, Commit.class);
+        return commit;
+    }
+    public static void reset(String c) {
+        loadRepo();
+        c = checkShortenedCommit(c);
+        Commit commit = loadCommit(c);
         clearStaging();
         clearCWD();
         // replace all the files
-        TreeMap<String, Blob> blobMap = head.getBlobs().getSet();
+        TreeMap<String, Blob> blobMap = commit.getBlobs().getSet();
         for (String UID : blobMap.keySet()) {
             Blob newBlob = blobMap.get(UID);
             File fileLocation = Utils.join(CWD, newBlob.getName());
@@ -335,9 +394,10 @@ public class Repository implements Serializable {
         }
         saveRepo();
     }
+
     public static void commitFileCheck(String c, String f) {
-        File commitFile = Utils.join(COMMITS_DIR, c);
-        Commit commit = readObject(commitFile, Commit.class);
+        c = checkShortenedCommit(c);
+        Commit commit = loadCommit(c);
         BlobList headBlobs = commit.getBlobs();
         if (!headBlobs.containsFileByName(f)) {
             System.out.println("File does not exist in that commit.");
@@ -347,5 +407,90 @@ public class Repository implements Serializable {
         String replaceBlobName = headBlobs.returnFileUIDByName(f);
         Blob replaceBlob = headBlobs.returnBlob(replaceBlobName);
         writeContents(fileLocation, replaceBlob.getContents());
+    }
+    public static void mergeOrchestrator(String b) {
+        loadRepo();
+        Branch branchB = branchMapKV.get(b);
+        Commit commitA = head;
+        Commit commitB = branchB.peek();
+        Commit ancestor = findAncestor(commitA, commitB);
+        recon(commitA, commitB, ancestor);
+        commit(b, "Merge");
+        Merge newHead = (Merge) head;
+        newHead.setGivenParent(commitB);
+        System.out.println("Merged " + b + " into " + currentBranch.getName());
+        saveRepo();
+    }
+
+    public static Commit findAncestor(Commit a, Commit b) {
+        HashSet<String> givenHistory = new HashSet<String>();
+        Commit curr = a;
+        Commit given = b;
+        // get all parents of the given branch
+        while (given != null) {
+            givenHistory.add(given.getUID());
+            given = given.getParent();
+        }
+        // if current is already in the given parents, fast-forward.
+        if (givenHistory.contains(curr.getUID())) {
+            reset(b.getUID());
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+        while (!givenHistory.contains(curr.getUID())) {
+            curr = curr.getParent();
+        }
+
+        // if the current branch equals the initial given, it means that given was an ancestor of the head
+        if (curr.equals(b)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+
+        return curr;
+    }
+
+    public static void recon(Commit curr, Commit given, Commit split) {
+        BlobList splitBlobs = split.getBlobs();
+        BlobList givenBlobs = given.getBlobs();
+        BlobList currBlobs = curr.getBlobs();
+        Set<String> masterSet = new TreeSet<>(splitBlobs.getFileKeys());
+        masterSet.addAll(givenBlobs.getFileKeys());
+        masterSet.addAll(currBlobs.getFileKeys());
+
+        for (String f: masterSet) {
+            Blob splitBlob = splitBlobs.returnBlobByName(f);
+            Blob givenBlob = givenBlobs.returnBlobByName(f);
+            Blob currBlob = currBlobs.returnBlobByName(f);
+
+            if (currBlob != null && splitBlob != null && givenBlob != null) {
+                if (currBlob.equals(splitBlob) && !currBlob.equals(givenBlob)) {
+                    commitFileCheck(given.getUID(), f);
+                    add(f);
+                } else if (givenBlob.equals(splitBlob) && !currBlob.equals(givenBlob)) {
+                    continue;
+                } else if (currBlob.equals(splitBlob)) {
+                    System.out.println("case3");
+                    continue;
+                }
+
+            }
+            if (splitBlob == null && givenBlob == null) {
+                continue;
+            }  else if (splitBlob == null && currBlob == null) {
+                commitFileCheck(given.getUID(), f);
+                add(f);
+            }  else if (currBlob.equals(splitBlob) && givenBlob == null) {
+                System.out.println("case6");
+                remove(f);
+            } else if (givenBlob.equals(splitBlob) && currBlob == null) {
+                System.out.println("case7");
+                continue;
+            } else if(!currBlob.equals(splitBlob) && !currBlob.equals(givenBlob)) {
+                File fileLocation = Utils.join(CWD, f);
+                writeContents(fileLocation, "<<<<<<< HEAD\n", currBlob.getContents(), "=======\n", givenBlob.getContents(), ">>>>>>>");
+                add(f);
+            }
+        }
     }
 }
