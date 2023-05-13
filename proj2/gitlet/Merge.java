@@ -21,9 +21,9 @@ public class Merge extends Commit {
     public void prettyPrint() {
         System.out.println("===");
         String firstMessage = "Merge: ";
-        firstMessage += getParent().getUID().substring(0,7);
+        firstMessage += getParent().getUID().substring(0, 7);
         firstMessage += "";
-        firstMessage += givenParent.getUID().substring(0,7);
+        firstMessage += givenParent.getUID().substring(0, 7);
         System.out.println(firstMessage);
         System.out.println("commit " + this.getUID());
         System.out.println("Date: " + this.getTimestamp());

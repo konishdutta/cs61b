@@ -144,7 +144,9 @@ public class Repository implements Serializable {
         loadRepo();
         loadStage();
         File file = Utils.join(CWD, f);
-        if (file.exists()) {
+
+        /* delete the file if and only if it exists in the head */
+        if (file.exists() && head.getBlobs().containsFileByName(f)) {
             Blob b = new Blob(file);
             Utils.restrictedDelete(file);
             deleteStagedBlob(b);
@@ -195,15 +197,33 @@ public class Repository implements Serializable {
         Blob b = new Blob(file);
 
         BlobList stagedBlobs = stage.getBlobs();
+
+        /*
+        * if the filename is in staged
+        * and the blob is the same
+        * exit
+         */
         if (stagedBlobs.contains(b) && stagedBlobs.containsFile(b)) {
             return;
         }
+        /*
+         * if the filename is in staged
+         * but the blob is different
+         * do nothing
+         */
         if (stagedBlobs.containsFile(b)) {
             String duplicateBlobName = stagedBlobs.returnFileUID(b);
             Blob duplicateBlob = stagedBlobs.returnBlob(duplicateBlobName);
             stagedBlobs.removeBlob(duplicateBlob);
             deleteStagedBlob(duplicateBlob);
         }
+        /*
+        * if the file is not in staged
+        * but the file is in head
+        * that means we removed the file
+        * and now are adding it back in
+         */
+        //TODO
         if (head.getBlobs().contains(b)) {
             stagedBlobs.addBlob(b);
             stage.saveCommit(STAGING_DIR);
@@ -315,7 +335,7 @@ public class Repository implements Serializable {
         String modString = "";
         String untrackedString = "";
         for (String f : files) {
-            if (stageBlobs.containsKey(f)) { // blob does contain the filename
+            if (stageBlobs.containsKey(f)) { // blob contains filename
                 File workFile = Utils.join(CWD, f);
                 Blob workBlob = new Blob(workFile);
                 if (!workBlob.getUID().equals(stageBlobs.get(f))) {
@@ -388,8 +408,8 @@ public class Repository implements Serializable {
         clearCWD();
         // replace all the files
         TreeMap<String, Blob> blobMap = commit.getBlobs().getSet();
-        for (String UID : blobMap.keySet()) {
-            Blob newBlob = blobMap.get(UID);
+        for (String id : blobMap.keySet()) {
+            Blob newBlob = blobMap.get(id);
             File fileLocation = Utils.join(CWD, newBlob.getName());
             writeContents(fileLocation, newBlob.getContents());
         }
@@ -453,7 +473,10 @@ public class Repository implements Serializable {
             curr = curr.getParent();
         }
 
-        // if the current branch equals the initial given, it means that given was an ancestor of the head
+        /*
+        * if the current branch equals the initial given,
+        * it means that given was an ancestor of the head
+         */
         if (curr.equals(b)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
