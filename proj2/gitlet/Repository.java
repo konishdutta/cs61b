@@ -410,7 +410,7 @@ public class Repository implements Serializable {
     }
     public static void mergeOrchestrator(String b) {
         loadRepo();
-        if (stage.getAddFiles() != null || stage.getRemoveFiles() != null) {
+        if (stage != null && (stage.getAddFiles() != null || stage.getRemoveFiles() != null)) {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }

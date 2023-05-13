@@ -73,7 +73,7 @@ public class Main {
                     }
                     Repository.commitFileCheck(Repository.head.getUID(), args[2]);
                 } else if (args.length == 4) {
-                    if (!args[2].equals("--") || args[1].toString().length() != 40 || args[1].toString().length() != 6) {
+                    if (!args[2].equals("--")) {
                         System.out.println("Incorrect operands.");
                         System.exit(0);
                     }
