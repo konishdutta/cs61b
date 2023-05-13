@@ -58,9 +58,9 @@ public class Main {
             case "debug":
                 Repository.loadRepo();
                 Repository.loadStage();
-                System.out.println("Head: " + Repository.head.getBlobs().getSet());
-                System.out.println("Stage: " + Repository.stage.getBlobs().getSet());
-                System.out.println("Branches: " + Repository.branchMapKV);
+                System.out.println("Head: " + Repository.getHead().getBlobs().getSet());
+                System.out.println("Stage: " + Repository.getStage().getBlobs().getSet());
+                System.out.println("Branches: " + Repository.getBranches());
                 break;
             case "checkout":
                 Repository.loadRepo();
@@ -71,7 +71,7 @@ public class Main {
                         System.out.println("Incorrect operands.");
                         System.exit(0);
                     }
-                    Repository.commitFileCheck(Repository.head.getUID(), args[2]);
+                    Repository.commitFileCheck(Repository.getHead().getUID(), args[2]);
                 } else if (args.length == 4) {
                     if (!args[2].equals("--")) {
                         System.out.println("Incorrect operands.");

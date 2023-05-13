@@ -1,32 +1,29 @@
 package gitlet;
 
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import java.io.Serializable;
 import java.util.*;
-
-import static gitlet.Utils.plainFilenamesIn;
 
 public class BlobList implements Serializable {
     private TreeMap<String, Blob> blobs = new TreeMap<String, Blob>();
     private TreeMap<String, String> fileMap = new TreeMap<String, String>();
     private String UID;
-    public BlobList(){
+    public BlobList() {
         UID = "";
     }
-    public String getUID(){
+    public String getUID() {
         generateUID();
         return UID;
     }
-    public TreeMap<String, Blob> getSet(){
+    public TreeMap<String, Blob> getSet() {
         return blobs;
     }
-    public TreeMap<String, String> getFileSet(){
+    public TreeMap<String, String> getFileSet() {
         return fileMap;
     }
-    public Set<String> getFileKeys(){
+    public Set<String> getFileKeys() {
         return fileMap.keySet();
     }
-    private void generateUID(){
+    private void generateUID() {
         UID = Utils.sha1(blobs.keySet().toArray());
     }
     public void addBlob(Blob b) {
@@ -40,15 +37,15 @@ public class BlobList implements Serializable {
     }
     public void removeBlobByFile(Blob b) {
         String name = b.getName();
-        String UID = fileMap.get(name);
-        blobs.remove(UID);
+        String removeVal = fileMap.get(name);
+        blobs.remove(removeVal);
         fileMap.remove(name);
     }
 
     public void removeBlobByFilename(String b) {
         String name = b;
-        String UID = fileMap.get(name);
-        blobs.remove(UID);
+        String removeVal = fileMap.get(name);
+        blobs.remove(removeVal);
         fileMap.remove(name);
     }
 
@@ -94,6 +91,11 @@ public class BlobList implements Serializable {
         }
         BlobList c = (BlobList) obj;
         return this.blobs.equals(c.blobs);
+    }
+
+    @Override
+    public int hashCode() {
+        return blobs.entrySet().hashCode();
     }
 
     @Override

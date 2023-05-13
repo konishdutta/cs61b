@@ -30,16 +30,17 @@ public class Repository implements Serializable {
     public static final File COMMITS_BLOBS_DIR = join(COMMITS_DIR, "blobs");
     public static final File CURRENT_BRANCH = join(GITLET_DIR, "CURRENT_BRANCH");
     public static final File COMMIT_ABBREV = join(GITLET_DIR, "COMMIT_ABBREV");
-    public static Commit head = null;
-    public static TreeMap<String, Branch> branchMapKV = new TreeMap<String, Branch>();
-    public static TreeMap<String, String> commitAbbrev = new TreeMap<String, String>();
-    public static Stage stage = null;
-    public static Branch currentBranch;
+    private static Commit head = null;
+    private static TreeMap<String, Branch> branchMapKV = new TreeMap<String, Branch>();
+    private static TreeMap<String, String> commitAbbrev = new TreeMap<String, String>();
+    private static Stage stage = null;
+    private static Branch currentBranch;
 
     public static void init() {
         /* make all the files */
         if (GITLET_DIR.exists()) {
-            System.out.print("A Gitlet version-control system already exists in the current directory.");
+            System.out.print("A Gitlet version-control system already exists "
+                    + "in the current directory.");
             return;
         }
         GITLET_DIR.mkdirs();
@@ -72,15 +73,15 @@ public class Repository implements Serializable {
         saveRepo();
     }
     public static void abbreviateCommit(Commit c) {
-        String UID = c.getUID();
-        String abbrev = UID.substring(0, 6);
+        String fullID = c.getUID();
+        String abbrev = fullID.substring(0, 6);
         if (commitAbbrev.containsKey(abbrev)) {
             commitAbbrev.put(abbrev, "collision");
         } else {
-            commitAbbrev.put(abbrev, UID);
+            commitAbbrev.put(abbrev, fullID);
         }
     }
-    public static void addBranch(String label){
+    public static void addBranch(String label) {
         loadRepo();
         if (branchMapKV.containsKey(label)) {
             System.out.println("A branch with that name already exists.");
@@ -90,7 +91,7 @@ public class Repository implements Serializable {
         saveRepo();
     }
 
-    public static void removeBranch(String label){
+    public static void removeBranch(String label) {
         loadRepo();
         if (label.equals(currentBranch.getName())) {
             System.out.println("Cannot remove the current branch.");
@@ -276,7 +277,7 @@ public class Repository implements Serializable {
                 printed = true;
             }
         }
-        if (printed == false) {
+        if (!printed) {
             System.out.println("Found no commit with that message.");
         }
     }
@@ -325,7 +326,7 @@ public class Repository implements Serializable {
             }
         }
         for (String f : head.getBlobs().getFileKeys()) {
-            if(!KonishAlgos.binSearch(f, files) && !remove.contains(f)) {
+            if (!KonishAlgos.binSearch(f, files) && !remove.contains(f)) {
                 // TO DO: make sure it's not in deleted
                 modString += f + " (deleted)\n";
             }
@@ -358,7 +359,7 @@ public class Repository implements Serializable {
     }
 
     public static void branchCheck(String b) {
-        if(!branchMapKV.containsKey(b)) {
+        if (!branchMapKV.containsKey(b)) {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
@@ -474,8 +475,9 @@ public class Repository implements Serializable {
         List<String> cwdFiles = plainFilenamesIn(CWD);
 
         for (String f: cwdFiles) {
-            if(!masterSet.contains(f)) {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+            if (!masterSet.contains(f)) {
+                System.out.println("There is an untracked file in the way;"
+                                + "delete it, or add and commit it first.");
                 System.exit(0);
             }
         }
@@ -520,5 +522,19 @@ public class Repository implements Serializable {
             }
         }
         return mergeConflict;
+    }
+    public static Commit getHead() {
+        return head;
+    }
+
+    public static Commit getStage() {
+        return stage;
+    }
+
+    public static TreeMap getBranches() {
+        return branchMapKV;
+    }
+    public static Branch getCurrentBranch() {
+        return currentBranch;
     }
 }

@@ -22,7 +22,7 @@ public class Commit implements Serializable, Comparable<Commit> {
     public Commit(String m, Instant ts, BlobList blobs) {
         this.message = m;
         this.timestamp = ts;
-        this.parent = Repository.head;
+        this.parent = Repository.getHead();
         this.blobs = blobs;
         generateUID();
     }
@@ -36,7 +36,7 @@ public class Commit implements Serializable, Comparable<Commit> {
         if (this.blobs != null) {
             arg3 = this.blobs.getUID();
         }
-        if(this.parent != null) {
+        if (this.parent != null) {
             arg4 = this.parent.UID;
         }
         this.UID = Utils.sha1(message, timestamp.toString(), arg3, arg4);
@@ -44,7 +44,7 @@ public class Commit implements Serializable, Comparable<Commit> {
 
     public void saveCommit(File dir) {
         File destination = join(dir, this.UID);
-        if(!destination.exists()) {
+        if (!destination.exists()) {
             try {
                 destination.createNewFile();
             } catch (IOException e) {
@@ -53,7 +53,7 @@ public class Commit implements Serializable, Comparable<Commit> {
         }
         writeObject(destination, this);
     }
-    public BlobList getBlobs(){
+    public BlobList getBlobs() {
         if (this.blobs == null) {
             return new BlobList();
         }
@@ -63,7 +63,10 @@ public class Commit implements Serializable, Comparable<Commit> {
         return this.UID;
     }
     public String getTimestamp() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss yyyy Z").withZone(ZoneId.systemDefault());
+        String pattern = "EEE MMM d HH:mm:ss yyyy Z";
+        ZoneId zone = ZoneId.systemDefault();
+        DateTimeFormatter formatter;
+        formatter = DateTimeFormatter.ofPattern(pattern).withZone(zone);
         return formatter.format(this.timestamp);
     }
     public String getMessage() {
@@ -91,7 +94,7 @@ public class Commit implements Serializable, Comparable<Commit> {
         this.parent = p;
     }
 
-    public int size(){
+    public int size() {
         return blobs.getSet().size();
     }
     @Override
@@ -104,6 +107,11 @@ public class Commit implements Serializable, Comparable<Commit> {
         }
         Commit c = (Commit) obj;
         return this.UID.equals(c.UID);
+    }
+
+    @Override
+    public int hashCode() {
+        return UID.hashCode();
     }
 
     @Override

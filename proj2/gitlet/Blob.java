@@ -26,7 +26,7 @@ public class Blob implements Serializable, Comparable<Blob> {
         this.UID = id;
     }
 
-    public String getName(){
+    public String getName() {
         return this.name;
     }
 
@@ -35,7 +35,7 @@ public class Blob implements Serializable, Comparable<Blob> {
     }
     public void saveBlob(File dir) {
         File destination = join(dir, this.UID);
-        if(!destination.exists()) {
+        if (!destination.exists()) {
             try {
                 destination.createNewFile();
             } catch (IOException e) {
@@ -76,5 +76,8 @@ public class Blob implements Serializable, Comparable<Blob> {
             return UID;
         }
     }
+    @Override
+    public int hashCode() {
+        return UID.hashCode();
+    }
 }
-

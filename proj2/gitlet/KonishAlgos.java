@@ -4,7 +4,7 @@ import java.util.List;
 
 public class KonishAlgos {
     public static Boolean binSearch(String o, List<String> a) {
-        int p2 = a.size()-1;
+        int p2 = a.size() - 1;
         int p1 = 0;
 
         while (p1 <= p2) {

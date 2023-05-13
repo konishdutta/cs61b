@@ -22,10 +22,10 @@ public class Stage extends Commit {
     public void remove(String filename) {
         removeFiles.add(filename);
     }
-    public HashSet<String> getAddFiles(){
+    public HashSet<String> getAddFiles() {
         return addFiles;
     }
-    public HashSet<String> getRemoveFiles(){
+    public HashSet<String> getRemoveFiles() {
         return removeFiles;
     }
 
