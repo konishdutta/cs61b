@@ -70,8 +70,11 @@ public class Blob implements Serializable, Comparable<Blob> {
     }
     @Override
     public String toString() {
-        String res = readContentsAsString(file);
-        return res;
+        if (UID == null) {
+            return "";
+        } else {
+            return UID;
+        }
     }
 }
 

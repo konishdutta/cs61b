@@ -410,15 +410,26 @@ public class Repository implements Serializable {
     }
     public static void mergeOrchestrator(String b) {
         loadRepo();
+        if (stage.getAddFiles() != null || stage.getRemoveFiles() != null) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
         Branch branchB = branchMapKV.get(b);
+        if (branchB.getName().equals(b)) {
+            System.out.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
         Commit commitA = head;
         Commit commitB = branchB.peek();
         Commit ancestor = findAncestor(commitA, commitB);
-        recon(commitA, commitB, ancestor);
+        boolean mergeConflict = recon(commitA, commitB, ancestor);
         commit(b, "Merge");
         Merge newHead = (Merge) head;
         newHead.setGivenParent(commitB);
         System.out.println("Merged " + b + " into " + currentBranch.getName());
+        if (mergeConflict) {
+            System.out.println("Encountered a merge conflict");
+        }
         saveRepo();
     }
 
@@ -450,7 +461,8 @@ public class Repository implements Serializable {
         return curr;
     }
 
-    public static void recon(Commit curr, Commit given, Commit split) {
+    public static boolean recon(Commit curr, Commit given, Commit split) {
+        boolean mergeConflict = false;
         BlobList splitBlobs = split.getBlobs();
         BlobList givenBlobs = given.getBlobs();
         BlobList currBlobs = curr.getBlobs();
@@ -458,39 +470,55 @@ public class Repository implements Serializable {
         masterSet.addAll(givenBlobs.getFileKeys());
         masterSet.addAll(currBlobs.getFileKeys());
 
-        for (String f: masterSet) {
-            Blob splitBlob = splitBlobs.returnBlobByName(f);
-            Blob givenBlob = givenBlobs.returnBlobByName(f);
-            Blob currBlob = currBlobs.returnBlobByName(f);
+        /* check for untracked files */
+        List<String> cwdFiles = plainFilenamesIn(CWD);
 
-            if (currBlob != null && splitBlob != null && givenBlob != null) {
-                if (currBlob.equals(splitBlob) && !currBlob.equals(givenBlob)) {
-                    commitFileCheck(given.getUID(), f);
-                    add(f);
-                } else if (givenBlob.equals(splitBlob) && !currBlob.equals(givenBlob)) {
-                    continue;
-                } else if (currBlob.equals(splitBlob)) {
-                    System.out.println("case3");
-                    continue;
-                }
-
-            }
-            if (splitBlob == null && givenBlob == null) {
-                continue;
-            }  else if (splitBlob == null && currBlob == null) {
-                commitFileCheck(given.getUID(), f);
-                add(f);
-            }  else if (currBlob.equals(splitBlob) && givenBlob == null) {
-                System.out.println("case6");
-                remove(f);
-            } else if (givenBlob.equals(splitBlob) && currBlob == null) {
-                System.out.println("case7");
-                continue;
-            } else if(!currBlob.equals(splitBlob) && !currBlob.equals(givenBlob)) {
-                File fileLocation = Utils.join(CWD, f);
-                writeContents(fileLocation, "<<<<<<< HEAD\n", currBlob.getContents(), "=======\n", givenBlob.getContents(), ">>>>>>>");
-                add(f);
+        for (String f: cwdFiles) {
+            if(!masterSet.contains(f)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
             }
         }
+
+        for (String f: masterSet) {
+            String splitBlob = "";
+            if (splitBlobs.returnBlobByName(f) != null) {
+                splitBlob = splitBlobs.returnBlobByName(f).toString();
+            }
+            String givenBlob = "";
+            if (givenBlobs.returnBlobByName(f) != null) {
+                givenBlob = givenBlobs.returnBlobByName(f).toString();
+            }
+            String currBlob = "";
+            if (currBlobs.returnBlobByName(f) != null) {
+                currBlob = currBlobs.returnBlobByName(f).toString();
+            }
+
+            if ((currBlob.equals(givenBlob)) || (splitBlob.equals(givenBlob))) {
+                continue;
+            } else if (currBlob.equals(splitBlob) && !givenBlob.equals("")) {
+                commitFileCheck(given.getUID(), f);
+                add(f);
+            } else if (currBlob.equals(splitBlob) && givenBlob.equals("")) {
+                remove(f);
+            } else {
+                File fileLocation = Utils.join(CWD, f);
+                Object arg1 = "<<<<<<< HEAD\n";
+                Object arg2 = "";
+                if (!currBlob.equals("")) {
+                    arg2 = currBlobs.returnBlobByName(f).getContents();
+                }
+                Object arg3 = "=======\n";
+                Object arg4 = "";
+                if (!givenBlob.equals("")) {
+                    arg4 = givenBlobs.returnBlobByName(f).getContents();
+                }
+                Object arg5 = ">>>>>>>";
+                writeContents(fileLocation, arg1, arg2, arg3, arg4, arg5);
+                add(f);
+                mergeConflict = true;
+            }
+        }
+        return mergeConflict;
     }
 }
