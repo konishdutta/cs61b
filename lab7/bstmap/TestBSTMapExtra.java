@@ -21,6 +21,7 @@ public class TestBSTMapExtra {
         }
         assertEquals(455, b.size()); //keys are there
         Set<String> keySet = b.keySet();
+        System.out.println(b.keySet());
         assertTrue(values.containsAll(keySet));
         assertTrue(keySet.containsAll(values));
     }
