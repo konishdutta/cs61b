@@ -100,9 +100,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     // TODO: Implement the methods of the Map61B Interface below
     // Your code won't compile until you do so!
-    public void put(K key) {
-        put(key, null);
-    }
+
     public V get(K key) {
         int tableNum = tableNum(key);
         Collection<Node> b = buckets[tableNum];
@@ -125,7 +123,20 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return false;
     }
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        int tableNum = tableNum(key);
+        Collection<Node> b = buckets[tableNum];
+        if (b != null) {
+            Iterator<Node> itr = b.iterator();
+            while (itr.hasNext()) {
+                Node elem = itr.next();
+                if (elem.key.equals(key)) {
+                    V tmp = elem.value;
+                    buckets[tableNum].remove(elem);
+                    return tmp;
+                }
+            }
+        }
+        return null;
     }
 
     public V remove(K key, V value) {
@@ -159,6 +170,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         buckets[tableNum].add(createNode(key, value));
         size += 1;
         keys.add(key);
+        resize();
     }
 
     public Set<K> keySet() {
@@ -171,7 +183,14 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
     private void resize() {
-
+        if (size / mapSize > load) {
+            MyHashMap tmp = new MyHashMap(mapSize * 2, load);
+            for (K elem : keys) {
+                tmp.put(elem, this.get(elem));
+            }
+            buckets = tmp.buckets;
+            mapSize = mapSize * 2;
+        }
     }
 
     private int tableNum(K key) {
