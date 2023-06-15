@@ -1,5 +1,6 @@
 package bstmap;
 
+import java.util.Iterator;
 import java.util.Set;
 
 /* Your implementation BSTMap should implement this interface. To do so,
@@ -38,5 +39,6 @@ public interface Map61B<K, V> extends Iterable<K> {
      * the specified value. Not required for Lab 7. If you don't implement this,
      * throw an UnsupportedOperationException.*/
     V remove(K key, V value);
+    Iterator<K> iterator();
 
 }

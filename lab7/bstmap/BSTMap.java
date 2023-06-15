@@ -159,25 +159,25 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
 
     @Override
     public Iterator<K> iterator() {
-        throw new UnsupportedOperationException();
+        return new BSTIterator();
     }
 
     private class BSTIterator implements Iterator<K> {
         private BSTNode curr = node;
+        private Stack<BSTNode> nodeStack = new Stack<BSTNode>();
         @Override
         public boolean hasNext() {
-            return curr == null;
+            return curr != null || !nodeStack.isEmpty();
         }
 
         @Override
         public K next() {
-            Stack<BSTNode> stack = new Stack();
-            while (curr != null || !stack.isEmpty()) {
+            while (curr != null || !nodeStack.isEmpty()) {
                 if (curr != null) {
-                    stack.push(curr);
+                    nodeStack.push(curr);
                     curr = curr.left;
                 } else {
-                    curr = stack.pop();
+                    curr = nodeStack.pop();
                     K res = curr.key;
                     curr = curr.right;
                     return res;

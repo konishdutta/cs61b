@@ -113,5 +113,20 @@ public class TestBSTMapExtra {
         assertEquals(0, noChild.size());
         assertEquals(null, noChild.get('Z'));
     }
+    @Test
+    public void testIterator() {
+        BSTMap testBST = new BSTMap();
+        testBST.put('K', 1);
+        testBST.put('D', 2);
+        testBST.put('P', 3);
+        testBST.put('A', 4);
+        testBST.put('F', 5);
+        testBST.put('O', 6);
+        testBST.put('Z', 7);
+
+        for (Object x : testBST) {
+            System.out.println(x);
+        }
+    }
 
 }
