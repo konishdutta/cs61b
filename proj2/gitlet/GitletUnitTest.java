@@ -40,4 +40,14 @@ public class GitletUnitTest {
         KonishAlgos.mergeSort(testList);
         assertTrue(KonishAlgos.binSearch("hello.txt", testList));
     }
+
+    @Test
+    public void patternMatchTest() {
+        String pattern = "abc";
+        String full1 = "behaabcehi";
+        String full2 = "geairahnai";
+        assertTrue(KonishAlgos.patternMatch(pattern, full1));
+        assertFalse(KonishAlgos.patternMatch(pattern, full2));
+
+    }
 }

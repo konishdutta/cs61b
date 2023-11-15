@@ -1,6 +1,5 @@
 package gitlet;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class KonishAlgos {
     public static Boolean binSearch(String o, List<String> a) {
@@ -51,6 +50,36 @@ public class KonishAlgos {
             a.set(i + j, sub2.get(j));
             j += 1;
         }
+    }
+
+    public static boolean patternMatch(String abbrev, String full) {
+        Map<Character, Integer> table = buildTable(abbrev);
+        int pPos = 0;
+        while (pPos + abbrev.length() <= full.length()) {
+            int charPos = abbrev.length() - 1;
+            while (charPos >= 0 && full.charAt(charPos + pPos) == abbrev.charAt(charPos)) {
+                charPos -= 1;
+            }
+            if (charPos == -1) {
+                return true;
+            } else {
+                int shift = table.getOrDefault(full.charAt(charPos + pPos), -1);
+                if (shift < charPos) {
+                    pPos = pPos + (charPos - shift);
+                } else {
+                    pPos += 1;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static Map<Character, Integer> buildTable(String abbrev) {
+        Map<Character, Integer> res = new HashMap<>();
+        for (int i = 0; i < abbrev.length(); i++) {
+            res.put(abbrev.charAt(i), i);
+        }
+        return res;
     }
 
 

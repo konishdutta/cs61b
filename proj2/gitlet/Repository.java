@@ -32,7 +32,7 @@ public class Repository implements Serializable {
     public static final File COMMIT_ABBREV = join(GITLET_DIR, "COMMIT_ABBREV");
     private static Commit head = null;
     private static TreeMap<String, Branch> branchMapKV = new TreeMap<String, Branch>();
-    private static TreeMap<String, String> commitAbbrev = new TreeMap<String, String>();
+    private static TreeMap<String, LinkedList<String>> commitAbbrev = new TreeMap<String, LinkedList<String>>();
     private static Stage stage = null;
     private static Branch currentBranch;
 
@@ -74,12 +74,11 @@ public class Repository implements Serializable {
     }
     public static void abbreviateCommit(Commit c) {
         String fullID = c.getUID();
-        String abbrev = fullID.substring(0, 6);
-        if (commitAbbrev.containsKey(abbrev)) {
-            commitAbbrev.put(abbrev, "collision");
-        } else {
-            commitAbbrev.put(abbrev, fullID);
+        String abbrev = fullID.substring(0, 2);
+        if (!commitAbbrev.containsKey(abbrev)) {
+            commitAbbrev.put(abbrev, new LinkedList<String>());
         }
+        commitAbbrev.get(abbrev).add(fullID);
     }
     public static void addBranch(String label) {
         loadRepo();
@@ -315,8 +314,8 @@ public class Repository implements Serializable {
         }
         System.out.println();
         System.out.println("=== Staged Files ===");
-        Set add = stage.getAddFiles();
-        Set remove = stage.getRemoveFiles();
+        TreeSet add = stage.getAddFiles();
+        TreeSet remove = stage.getRemoveFiles();
         TreeMap<String, String> blobs = head.getBlobs().getFileSet();
         TreeMap<String, String> stageBlobs = stage.getBlobs().getFileSet();
         for (Object f : add) {
@@ -365,17 +364,15 @@ public class Repository implements Serializable {
     }
 
     public static String checkShortenedCommit(String c) {
-        if (c.length() != 6) {
+        if (c.length() == 40) {
             return c;
         }
-        if (!commitAbbrev.containsKey(c)) {
+        String candidate = searchAbbrev(c);
+        if (candidate == "error") {
             System.out.println("No commit with that id exists.");
             System.exit(0);
-        } else if (commitAbbrev.get(c).equals("collision")) {
-            System.out.println("Abbreviated commit has duplicates. Please use full commit UID");
-            System.exit(0);
         }
-        return commitAbbrev.get(c);
+        return candidate;
     }
 
     public static void branchCheck(String b) {
@@ -559,5 +556,17 @@ public class Repository implements Serializable {
     }
     public static Branch getCurrentBranch() {
         return currentBranch;
+    }
+    private static String searchAbbrev(String c) {
+        String subC = c.substring(0, 2);
+        if (!commitAbbrev.containsKey(subC)) {
+            return "error";
+        }
+        for (String cnd : commitAbbrev.get(subC)) {
+            if (cnd.substring(0, c.length()) == c) {
+                return cnd;
+            }
+        }
+        return "error";
     }
 }

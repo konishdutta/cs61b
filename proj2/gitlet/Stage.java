@@ -5,12 +5,12 @@ import java.util.*;
 
 
 public class Stage extends Commit {
-    private HashSet<String> addFiles;
-    private HashSet<String> removeFiles;
+    private TreeSet<String> addFiles;
+    private TreeSet<String> removeFiles;
     public Stage(Commit head) {
         super("stage", Instant.now(), head.getBlobs());
-        addFiles = new HashSet<String>();
-        removeFiles = new HashSet<String>();
+        addFiles = new TreeSet<String>();
+        removeFiles = new TreeSet<String>();
         saveCommit(Repository.STAGING_DIR);
     }
     public void add(String filename) {
@@ -22,10 +22,10 @@ public class Stage extends Commit {
     public void remove(String filename) {
         removeFiles.add(filename);
     }
-    public HashSet<String> getAddFiles() {
+    public TreeSet<String> getAddFiles() {
         return addFiles;
     }
-    public HashSet<String> getRemoveFiles() {
+    public TreeSet<String> getRemoveFiles() {
         return removeFiles;
     }
 
