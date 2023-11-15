@@ -379,7 +379,7 @@ public class Repository implements Serializable {
             return c;
         }
         String candidate = searchAbbrev(c);
-        if (candidate == "error") {
+        if (candidate.equals("error")) {
             System.out.println("No commit with that id exists.");
             System.exit(0);
         }
@@ -389,6 +389,10 @@ public class Repository implements Serializable {
     public static void branchCheck(String b) {
         if (!branchMapKV.containsKey(b)) {
             System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+        if (currentBranch.getName().equals(b)) {
+            System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
         // make the checkout branch the current branch
@@ -574,7 +578,7 @@ public class Repository implements Serializable {
             return "error";
         }
         for (String cnd : commitAbbrev.get(subC)) {
-            if (cnd.substring(0, c.length()) == c) {
+            if (cnd.substring(0, c.length()).equals(c)) {
                 return cnd;
             }
         }
