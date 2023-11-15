@@ -25,10 +25,6 @@ public class Main {
                 break;
             case "add":
                 validateNumArgs(args, 2);
-                if (!Repository.checkFileExists(args[1])) {
-                    System.out.println("File does not exist.");
-                    System.exit(0);
-                }
                 Repository.add(args[1]);
                 break;
             case "commit":

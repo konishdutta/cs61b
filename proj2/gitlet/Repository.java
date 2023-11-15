@@ -143,7 +143,6 @@ public class Repository implements Serializable {
         loadRepo();
         loadStage();
         File file = Utils.join(CWD, f);
-
         /* delete the file if and only if it exists in the head */
         if (file.exists() && head.getBlobs().containsFileByName(f)) {
             Blob b = new Blob(file);
@@ -191,11 +190,28 @@ public class Repository implements Serializable {
     public static void add(String f) {
         loadRepo();
         loadStage();
+        BlobList stagedBlobs = stage.getBlobs();
+
+        /*
+        if the file is removed, add it back in
+         */
+        if (stage.getRemoveFiles().contains(f)) {
+            stage.getRemoveFiles().remove(f);
+            Blob removedBlob = head.getBlobs().returnBlobByName(f);
+            File fileLocation = Utils.join(CWD, f);
+            writeContents(fileLocation, removedBlob.getContents());
+            stagedBlobs.addBlob(removedBlob);
+            stage.saveCommit(STAGING_DIR);
+            System.exit(0);
+        }
+        if (!Repository.checkFileExists(f)) {
+            System.out.println("File does not exist.");
+            System.exit(0);
+        }
         /* create the blob */
         File file = join(CWD, f);
         Blob b = new Blob(file);
 
-        BlobList stagedBlobs = stage.getBlobs();
 
         /*
         * if the filename is in staged
@@ -216,13 +232,8 @@ public class Repository implements Serializable {
             stagedBlobs.removeBlob(duplicateBlob);
             deleteStagedBlob(duplicateBlob);
         }
-        /*
-        * if the file is not in staged
-        * but the file is in head
-        * that means we removed the file
-        * and now are adding it back in
-         */
-        //TODO
+
+
         if (head.getBlobs().contains(b)) {
             stagedBlobs.addBlob(b);
             stage.saveCommit(STAGING_DIR);
