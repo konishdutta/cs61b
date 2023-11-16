@@ -448,6 +448,14 @@ public class Repository implements Serializable {
         Commit commit = loadCommit(c);
         head = commit;
         stage = new Stage(head);
+
+        /* move current branch pointer */
+        Commit curr = currentBranch.peek();
+        while (!curr.equals(commit)) {
+            currentBranch.pop();
+            curr = currentBranch.peek();
+        }
+
         clearCWD();
 
         // replace all the files

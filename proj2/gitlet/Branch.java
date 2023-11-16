@@ -20,6 +20,11 @@ public class Branch implements Serializable {
     public Commit peek() {
         return branchStack.peek();
     }
+    public Commit pop() {
+        Commit res = branchStack.pop();
+        Repository.updateBranchMap(this.name, this);
+        return res;
+    }
     public void push(Commit c) {
         branchStack.push(c);
         Repository.updateBranchMap(this.name, this);
