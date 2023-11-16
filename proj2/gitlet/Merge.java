@@ -10,7 +10,7 @@ public class Merge extends Commit {
         String passMessage = "Merged ";
         passMessage += givenBranch;
         passMessage += " into ";
-        passMessage += Repository.getCurrentBranch().getName();
+        passMessage += Repository.getCurrentBranch();
         passMessage += ".";
         return passMessage;
     }

@@ -31,10 +31,10 @@ public class Repository implements Serializable {
     public static final File CURRENT_BRANCH = join(GITLET_DIR, "CURRENT_BRANCH");
     public static final File COMMIT_ABBREV = join(GITLET_DIR, "COMMIT_ABBREV");
     private static Commit head = null;
-    private static TreeMap<String, Branch> branchMapKV = new TreeMap<>();
+    private static TreeMap<String, Commit> branchMapKV = new TreeMap<>();
     private static TreeMap<String, LinkedList<String>> commitAbbrev = new TreeMap<>();
     private static Stage stage = null;
-    private static Branch currentBranch;
+    private static String currentBranch;
 
     public static void init() {
         /* make all the files */
@@ -69,8 +69,8 @@ public class Repository implements Serializable {
         abbreviateCommit(initialCommit);
         updateMarker(initialCommit);
         head = initialCommit;
-        Branch masterBranch = new Branch(initialCommit, "master");
-        currentBranch = masterBranch;
+        currentBranch = "master";
+        branchMapKV.put(currentBranch, head);
         saveRepo();
     }
     public static void abbreviateCommit(Commit c) {
@@ -87,13 +87,13 @@ public class Repository implements Serializable {
             System.out.println("A branch with that name already exists.");
             System.exit(0);
         }
-        Branch newBranch = new Branch(head, label);
+        branchMapKV.put(label, head);
         saveRepo();
     }
 
     public static void removeBranch(String label) {
         loadRepo();
-        if (label.equals(currentBranch.getName())) {
+        if (label.equals(currentBranch)) {
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
         }
@@ -125,7 +125,7 @@ public class Repository implements Serializable {
         updateMarker(newCommit);
         newCommit.saveCommit(Repository.COMMITS_DIR);
         abbreviateCommit(newCommit);
-        currentBranch.push(newCommit);
+        branchMapKV.put(currentBranch, newCommit);
         commitStagedBlobs();
         saveRepo();
     }
@@ -177,10 +177,6 @@ public class Repository implements Serializable {
         } else {
             stage = Utils.readObject(Utils.join(STAGING_DIR, stageList.get(0)), Stage.class);
         }
-    }
-
-    public static void updateBranchMap(String label, Branch branch) {
-        branchMapKV.put(label, branch);
     }
 
     public static void log() {
@@ -256,7 +252,7 @@ public class Repository implements Serializable {
     public static void loadRepo() {
         head = readObject(HEAD_FILE, Commit.class);
         branchMapKV = readObject(MAP_STRING_COMMIT, TreeMap.class);
-        currentBranch = readObject(CURRENT_BRANCH, Branch.class);
+        currentBranch = readObject(CURRENT_BRANCH, String.class);
         commitAbbrev = readObject(COMMIT_ABBREV, TreeMap.class);
     }
 
@@ -319,7 +315,7 @@ public class Repository implements Serializable {
         System.out.println("=== Branches ===");
         for (String branch : branchMapKV.keySet()) {
             String marker = "";
-            if (currentBranch.getName().equals(branch)) {
+            if (currentBranch.equals(branch)) {
                 marker = "*";
             }
             System.out.println(marker + branch);
@@ -419,14 +415,14 @@ public class Repository implements Serializable {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
-        if (currentBranch.getName().equals(b)) {
+        if (currentBranch.equals(b)) {
             System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
         // make the checkout branch the current branch
-        currentBranch = branchMapKV.get(b);
+        currentBranch = b;
         // make the head the last branch in the current branch
-        head = currentBranch.peek();
+        head = branchMapKV.get(currentBranch);
         saveRepo();
         // clear the staging area and CWD
         reset(head.getUID());
@@ -450,12 +446,7 @@ public class Repository implements Serializable {
         stage = new Stage(head);
 
         /* move current branch pointer */
-        Commit curr = currentBranch.peek();
-        while (!curr.equals(commit)) {
-            currentBranch.pop();
-            curr = currentBranch.peek();
-        }
-
+        branchMapKV.put(currentBranch, head);
         clearCWD();
 
         // replace all the files
@@ -487,19 +478,18 @@ public class Repository implements Serializable {
             System.out.println("You have uncommitted changes.");
             System.exit(0);
         }
-        Branch branchB = branchMapKV.get(b);
-        if (branchB.getName().equals(b)) {
+        if (currentBranch.equals(b)) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
         Commit commitA = head;
-        Commit commitB = branchB.peek();
+        Commit commitB = branchMapKV.get(b);
         Commit ancestor = findAncestor(commitA, commitB);
         boolean mergeConflict = recon(commitA, commitB, ancestor);
         commit(b, "Merge");
         Merge newHead = (Merge) head;
         newHead.setGivenParent(commitB);
-        System.out.println("Merged " + b + " into " + currentBranch.getName());
+        System.out.println("Merged " + b + " into " + currentBranch);
         if (mergeConflict) {
             System.out.println("Encountered a merge conflict");
         }
@@ -609,7 +599,7 @@ public class Repository implements Serializable {
     public static TreeMap getBranches() {
         return branchMapKV;
     }
-    public static Branch getCurrentBranch() {
+    public static String getCurrentBranch() {
         return currentBranch;
     }
     private static String searchAbbrev(String c) {
