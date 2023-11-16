@@ -24,8 +24,8 @@ public class Merge extends Commit {
         firstMessage += getParent().getUID().substring(0, 7);
         firstMessage += "";
         firstMessage += givenParent.getUID().substring(0, 7);
-        System.out.println(firstMessage);
         System.out.println("commit " + this.getUID());
+        System.out.println(firstMessage);
         System.out.println("Date: " + this.getTimestamp());
         System.out.println(this.getMessage());
         System.out.println();
