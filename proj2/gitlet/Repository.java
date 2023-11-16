@@ -487,18 +487,22 @@ public class Repository implements Serializable {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
+        loadStage();
+        checkUntrackedFiles();
         Commit commitA = head;
         Commit commitB = branchMapKV.get(b);
         Commit ancestor = findAncestor(commitA, commitB);
         boolean mergeConflict = recon(commitA, commitB, ancestor);
-        if (mergeConflict) {
-            System.out.println("Encountered a merge conflict.");
-            System.exit(0);
-        }
+
         commit(b, "Merge");
         Merge newHead = (Merge) head;
         newHead.setGivenParent(commitB);
-        System.out.println("Merged " + b + " into " + currentBranch + ".");
+
+        if (mergeConflict) {
+            System.out.println("Encountered a merge conflict.");
+        } else {
+            System.out.println("Merged " + b + " into " + currentBranch + ".");
+        }
         saveRepo();
     }
 

@@ -1,8 +1,13 @@
 package gitlet;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Instant;
+
+import static gitlet.Utils.join;
+import static gitlet.Utils.writeObject;
+
 public class Merge extends Commit {
-    private Commit givenParent;
     public Merge(String givenBranch) {
         super(getMessage(givenBranch), Instant.now(), Repository.getStage().getBlobs());
     }
@@ -14,20 +19,18 @@ public class Merge extends Commit {
         passMessage += ".";
         return passMessage;
     }
-    public void setGivenParent(Commit p) {
-        givenParent = p;
-    }
     @Override
     public void prettyPrint() {
         System.out.println("===");
         String firstMessage = "Merge: ";
         firstMessage += getParent().getUID().substring(0, 7);
-        firstMessage += "";
-        firstMessage += givenParent.getUID().substring(0, 7);
+        firstMessage += " ";
+        firstMessage += getGivenParent().getUID().substring(0, 7);
         System.out.println("commit " + this.getUID());
         System.out.println(firstMessage);
         System.out.println("Date: " + this.getTimestamp());
         System.out.println(this.getMessage());
         System.out.println();
     }
+
 }

@@ -18,6 +18,7 @@ public class Commit implements Serializable, Comparable<Commit> {
     private Instant timestamp;
     private BlobList blobs;
     private Commit parent;
+    private Commit givenParent;
 
     public Commit(String m, Instant ts, BlobList blobs) {
         this.message = m;
@@ -96,6 +97,14 @@ public class Commit implements Serializable, Comparable<Commit> {
 
     public int size() {
         return blobs.getSet().size();
+    }
+
+    public Commit getGivenParent() {
+        return givenParent;
+    }
+    public void setGivenParent(Commit p) {
+        givenParent = p;
+        this.saveCommit(Repository.COMMITS_DIR);
     }
     @Override
     public boolean equals(Object obj) {
