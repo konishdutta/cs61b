@@ -446,8 +446,10 @@ public class Repository implements Serializable {
         checkUntrackedFiles();
         c = checkShortenedCommit(c);
         Commit commit = loadCommit(c);
-        clearStaging();
+        head = commit;
+        stage = new Stage(head);
         clearCWD();
+
         // replace all the files
         TreeMap<String, Blob> blobMap = commit.getBlobs().getSet();
         for (String id : blobMap.keySet()) {
