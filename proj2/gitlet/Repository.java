@@ -487,6 +487,10 @@ public class Repository implements Serializable {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
+        if (!branchMapKV.containsKey(b)) {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
         loadStage();
         checkUntrackedFiles();
         Commit commitA = head;
