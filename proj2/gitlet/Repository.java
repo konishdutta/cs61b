@@ -31,8 +31,8 @@ public class Repository implements Serializable {
     public static final File CURRENT_BRANCH = join(GITLET_DIR, "CURRENT_BRANCH");
     public static final File COMMIT_ABBREV = join(GITLET_DIR, "COMMIT_ABBREV");
     private static Commit head = null;
-    private static TreeMap<String, Branch> branchMapKV = new TreeMap<String, Branch>();
-    private static TreeMap<String, LinkedList<String>> commitAbbrev = new TreeMap<String, LinkedList<String>>();
+    private static TreeMap<String, Branch> branchMapKV = new TreeMap<>();
+    private static TreeMap<String, LinkedList<String>> commitAbbrev = new TreeMap<>();
     private static Stage stage = null;
     private static Branch currentBranch;
 
@@ -385,8 +385,34 @@ public class Repository implements Serializable {
         }
         return candidate;
     }
+    public static void checkUntrackedFiles() {
+        List<String> cwdFiles = plainFilenamesIn(CWD);
+        TreeMap<String, String> stageBlobs = stage.getBlobs().getFileSet();
+        /*
+        check for untracked files
+         */
+        for (String f: cwdFiles) {
+            String untrackedMsg = "There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.";
+            if (!stageBlobs.containsKey(f)) {
+                System.out.println(untrackedMsg);
+                System.exit(0);
+            } else {
+                File workFile = Utils.join(CWD, f);
+                Blob workBlob = new Blob(workFile);
+                if (!workBlob.getUID().equals(stageBlobs.get(f))) {
+                    System.out.println(untrackedMsg);
+                    System.exit(0);
+                }
+            }
+        }
+    }
 
     public static void branchCheck(String b) {
+        loadRepo();
+        loadStage();
+        checkUntrackedFiles();
+
         if (!branchMapKV.containsKey(b)) {
             System.out.println("No such branch exists.");
             System.exit(0);
@@ -414,6 +440,8 @@ public class Repository implements Serializable {
     }
     public static void reset(String c) {
         loadRepo();
+        loadStage();
+        checkUntrackedFiles();
         c = checkShortenedCommit(c);
         Commit commit = loadCommit(c);
         clearStaging();
