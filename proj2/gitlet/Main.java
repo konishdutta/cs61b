@@ -99,7 +99,7 @@ public class Main {
                 System.exit(0);
         }
     }
-    public static void validateNumArgs(String[] args, Integer n) {
+    private static void validateNumArgs(String[] args, Integer n) {
         if (args.length != n) {
             System.out.println("Incorrect operands.");
             System.exit(0);

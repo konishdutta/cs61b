@@ -250,6 +250,11 @@ public class Repository implements Serializable {
     }
 
     public static void loadRepo() {
+        if (!GITLET_DIR.exists()) {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+
         head = readObject(HEAD_FILE, Commit.class);
         branchMapKV = readObject(MAP_STRING_COMMIT, TreeMap.class);
         currentBranch = readObject(CURRENT_BRANCH, String.class);
@@ -486,13 +491,14 @@ public class Repository implements Serializable {
         Commit commitB = branchMapKV.get(b);
         Commit ancestor = findAncestor(commitA, commitB);
         boolean mergeConflict = recon(commitA, commitB, ancestor);
+        if (mergeConflict) {
+            System.out.println("Encountered a merge conflict.");
+            System.exit(0);
+        }
         commit(b, "Merge");
         Merge newHead = (Merge) head;
         newHead.setGivenParent(commitB);
-        System.out.println("Merged " + b + " into " + currentBranch);
-        if (mergeConflict) {
-            System.out.println("Encountered a merge conflict");
-        }
+        System.out.println("Merged " + b + " into " + currentBranch + ".");
         saveRepo();
     }
 
