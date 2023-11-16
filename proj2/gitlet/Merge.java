@@ -1,11 +1,5 @@
 package gitlet;
-
-import java.io.File;
-import java.io.IOException;
 import java.time.Instant;
-
-import static gitlet.Utils.join;
-import static gitlet.Utils.writeObject;
 
 public class Merge extends Commit {
     public Merge(String givenBranch) {

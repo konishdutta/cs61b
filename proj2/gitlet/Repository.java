@@ -500,8 +500,6 @@ public class Repository implements Serializable {
 
         if (mergeConflict) {
             System.out.println("Encountered a merge conflict.");
-        } else {
-            System.out.println("Merged " + b + " into " + currentBranch + ".");
         }
         saveRepo();
     }
@@ -546,16 +544,7 @@ public class Repository implements Serializable {
         masterSet.addAll(givenBlobs.getFileKeys());
         masterSet.addAll(currBlobs.getFileKeys());
 
-        /* check for untracked files */
         List<String> cwdFiles = plainFilenamesIn(CWD);
-
-        for (String f: cwdFiles) {
-            if (!masterSet.contains(f)) {
-                System.out.println("There is an untracked file in the way;"
-                                + "delete it, or add and commit it first.");
-                System.exit(0);
-            }
-        }
 
         for (String f: masterSet) {
             String splitBlob = "";
