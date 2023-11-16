@@ -68,6 +68,7 @@ public class Repository implements Serializable {
         initialCommit.saveCommit(Repository.COMMITS_DIR);
         abbreviateCommit(initialCommit);
         updateMarker(initialCommit);
+        head = initialCommit;
         Branch masterBranch = new Branch(initialCommit, "master");
         currentBranch = masterBranch;
         saveRepo();
@@ -378,6 +379,7 @@ public class Repository implements Serializable {
         if (c.length() == 40) {
             return c;
         }
+
         String candidate = searchAbbrev(c);
         if (candidate.equals("error")) {
             System.out.println("No commit with that id exists.");
@@ -392,8 +394,8 @@ public class Repository implements Serializable {
         check for untracked files
          */
         for (String f: cwdFiles) {
-            String untrackedMsg = "There is an untracked file in the way; " +
-                    "delete it, or add and commit it first.";
+            String untrackedMsg = "There is an untracked file in the way; "
+                    + "delete it, or add and commit it first.";
             if (!stageBlobs.containsKey(f)) {
                 System.out.println(untrackedMsg);
                 System.exit(0);
