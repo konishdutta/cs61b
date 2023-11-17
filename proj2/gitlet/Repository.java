@@ -9,7 +9,6 @@ import java.util.*;
 import static gitlet.Utils.*;
 import static gitlet.Utils.restrictedDelete;
 
-
 /** Represents a gitlet repository.
  *  does at a high level.
  *
@@ -23,7 +22,6 @@ public class Repository implements Serializable {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
     public static final File MAP_STRING_COMMIT = join(GITLET_DIR, "MAP_KV");
-    public static final File MAP_COMMIT_STRING = join(GITLET_DIR, "MAP_VK");
     public static final File STAGING_DIR = join(GITLET_DIR, "staging");
     public static final File STAGING_BLOBS_DIR = join(STAGING_DIR, "blobs");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
@@ -51,11 +49,6 @@ public class Repository implements Serializable {
         }
         try {
             MAP_STRING_COMMIT.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            MAP_COMMIT_STRING.createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -479,10 +472,6 @@ public class Repository implements Serializable {
     }
     public static void mergeOrchestrator(String b) {
         loadRepo();
-        if (stage != null && (stage.getAddFiles() != null || stage.getRemoveFiles() != null)) {
-            System.out.println("You have uncommitted changes.");
-            System.exit(0);
-        }
         if (currentBranch.equals(b)) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
@@ -491,8 +480,13 @@ public class Repository implements Serializable {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
+
         loadStage();
         checkUntrackedFiles();
+        if (stage.getAddFiles().size() > 0 || stage.getRemoveFiles().size() > 0) {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
         Commit commitA = head;
         Commit commitB = branchMapKV.get(b);
         Commit ancestor = findAncestor(commitA, commitB);
@@ -509,34 +503,55 @@ public class Repository implements Serializable {
     }
 
     public static Commit findAncestor(Commit a, Commit b) {
-        HashSet<String> givenHistory = new HashSet<String>();
-        Commit curr = a;
-        Commit given = b;
+        HashSet<String> givenHistory = new HashSet<>();
         // get all parents of the given branch
-        while (given != null) {
-            givenHistory.add(given.getUID());
-            given = given.getParent();
-        }
+        generateHistory(b, givenHistory);
         // if current is already in the given parents, fast-forward.
-        if (givenHistory.contains(curr.getUID())) {
+        if (givenHistory.contains(a.getUID())) {
             reset(b.getUID());
             System.out.println("Current branch fast-forwarded.");
             System.exit(0);
         }
-        while (!givenHistory.contains(curr.getUID())) {
-            curr = curr.getParent();
-        }
-
+        Commit res = traverseAncestor(a, givenHistory);
         /*
         * if the current branch equals the initial given,
         * it means that given was an ancestor of the head
          */
-        if (curr.equals(b)) {
+        if (res.equals(b)) {
             System.out.println("Given branch is an ancestor of the current branch.");
             System.exit(0);
         }
+        return res;
+    }
+    public static void generateHistory(Commit c, HashSet<String> res) {
+        if (c == null) {
+            return;
+        }
+        res.add(c.getUID());
+        generateHistory(c.getParent(), res);
+        generateHistory(c.getGivenParent(), res);
+    }
 
-        return curr;
+    public static Commit traverseAncestor(Commit c, HashSet<String> history) {
+        if (c == null) {
+            return null;
+        }
+        if (history.contains(c.getUID())) {
+            return c;
+        }
+        Commit parent1 = traverseAncestor(c.getParent(), history);
+        Commit parent2 = traverseAncestor(c.getGivenParent(), history);
+        if (parent1 != null && parent2 != null) {
+            if (parent1.getTimestamp().compareTo(parent2.getTimestamp()) < 0) {
+                return parent1;
+            } else {
+                return parent2;
+            }
+        } else if (parent2 == null) {
+            return parent1;
+        } else {
+            return parent2;
+        }
     }
 
     public static boolean recon(Commit curr, Commit given, Commit split) {
