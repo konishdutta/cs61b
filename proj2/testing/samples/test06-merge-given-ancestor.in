@@ -1,0 +1,21 @@
+# Check that when we merge with a branch that is an ancestor, nothing happens
+I definitions.inc
+> init
+<<<
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit "version 1 of wug.txt"
+<<<
+> branch given
+<<<
++ notwug.txt notwug.txt
+> add notwug.txt
+<<<
+> commit "version 2"
+<<<
+> merge given
+Given branch is an ancestor of the current branch.
+<<<
+= wug.txt wug.txt
+= notwug.txt notwug.txt

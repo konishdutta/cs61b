@@ -1,0 +1,31 @@
+# Check various merge scenarios
+# init --> commit 1 --> commit 2
+#                 |---> commit 3
+#
+I definitions.inc
+> init
+<<<
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit "version 1 of wug.txt"
+<<<
+> branch given
+<<<
++ notwug.txt notwug.txt
+> add notwug.txt
+<<<
+> commit "version 2"
+<<<
+> checkout given
+<<<
++ wug.txt notwug.txt
+> add wug.txt
+<<<
+> commit "version 3"
+<<<
+> merge master
+Merged master into given.
+<<<
+= wug.txt notwug.txt
+= notwug.txt notwug.txt

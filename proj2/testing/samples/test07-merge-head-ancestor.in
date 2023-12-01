@@ -1,0 +1,23 @@
+# Check that when we merge with a branch in front, we fast-forward
+I definitions.inc
+> init
+<<<
++ wug.txt wug.txt
+> add wug.txt
+<<<
+> commit "version 1 of wug.txt"
+<<<
+> branch given
+<<<
++ wug.txt notwug.txt
+> add wug.txt
+<<<
+> commit "version 2"
+<<<
+> checkout given
+<<<
+= wug.txt wug.txt
+> merge master
+Current branch fast-forwarded.
+<<<
+= wug.txt notwug.txt
