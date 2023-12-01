@@ -39,7 +39,7 @@ Gitlet mimics the key features of Git.
 
 ## Design
 See the basic class structure I used below:
-![Structure](/imgs/class_structure.png "Structure")
+![Structure](https://github.com/konishdutta/cs61b/blob/ed54a1c604c3afb857d2fae143f8da15dfebbf30/proj2/imgs/class_structure.png "Structure")
 
 
 
