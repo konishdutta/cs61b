@@ -593,12 +593,12 @@ public class Repository implements Serializable {
                 if (!currBlob.equals("")) {
                     arg2 = currBlobs.returnBlobByName(f).getContents();
                 }
-                Object arg3 = "\n=======\n";
+                Object arg3 = "=======\n";
                 Object arg4 = "";
                 if (!givenBlob.equals("")) {
                     arg4 = givenBlobs.returnBlobByName(f).getContents();
                 }
-                Object arg5 = "\n>>>>>>>";
+                Object arg5 = ">>>>>>>";
                 writeContents(fileLocation, arg1, arg2, arg3, arg4, arg5);
                 add(f);
                 mergeConflict = true;
