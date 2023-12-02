@@ -65,10 +65,8 @@ I was never saving the same file twice, saving space.
   - When a new commit is created, the map is updated.
   - When a user searches for an abbreviated commit,
   the algorithm takes the first two letters of the
-  abbreviation, then uses the Boyer-Moore algorithm
-    ([see code](https://github.com/konishdutta/cs61b/blob/a5c0ca4a9fe84147ba50db92383edc2bceaba654/proj2/gitlet/KonishAlgos.java#L55))
-  on each commit in the list until it finds the appropriate
-  match.
+  abbreviation as the key. I run down the associated linked list
+  until I find a commit ID that prefix matches with the given abbreviation.
 - I refactored my class structure a few times because my
 initial design wasn't correct. For example, my initial design
 included an explicit "Branch" class that tracked the
