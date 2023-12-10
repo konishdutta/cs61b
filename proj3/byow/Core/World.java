@@ -192,7 +192,13 @@ public class World {
 
 
     public static void main(String[] args) {
-        World w = new World(1223);
+        long n1 = 7685817615627686380L;
+        long n2 = 865562189400100566L;
+        World w = new World(n1);
+        w.randomLayout();
+        System.out.println(TETile.toString(w.map));
+
+        w = new World(n2);
         w.randomLayout();
         System.out.println(TETile.toString(w.map));
     }

@@ -45,9 +45,10 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        int randString = 0;
+        input = input.toUpperCase();
+        long randString = 0;
         for (int i = 0; i < input.length(); i++) {
-            if (i == 0 & !(input.charAt(i) == 'N')) {
+            if (i == 0 && input.charAt(i) != 'N') {
                 break;
             }
             if (Character.isDigit(input.charAt(i))) {
@@ -62,6 +63,7 @@ public class Engine {
         World w = new World(randString);
 
         TETile[][] finalWorldFrame = w.randomLayout();;
+        //System.out.println(TETile.toString(finalWorldFrame));
         return finalWorldFrame;
     }
 }
