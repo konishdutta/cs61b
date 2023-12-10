@@ -201,5 +201,6 @@ public class World {
         w = new World(n2);
         w.randomLayout();
         System.out.println(TETile.toString(w.map));
+        System.out.println(w.spaceList);
     }
 }

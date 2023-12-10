@@ -99,3 +99,8 @@
   #·####···············#   #··#    #··#                     #········#
   #·#  ##############··#   #··#    #··#                     ##··######
   ###               ####   ####    ####                      ####
+
+
+[Room #0: 25 x 9 at (14, 17), Room #1: 8 x 5 at (33, 7), Room #2: 7 x 7 at (2, 10), Room #3: 17 x 7 at (7, 1), Room #4: 12 x 6 at (56, 13), Room #5: 24 x 5 at (24, 12), Room #6: 10 x 8 at (60, 1), Hallway #7: 3 x 4 at (32, 26), Hallway #8: 9 x 3 at (24, 5), Hallway #9: 3 x 9 at (14, 8), Hallway #10: 8 x 3 at (48, 14), Hallway #11: 4 x 7 at (35, 0), Hallway #12: 2 x 4 at (0, 14), Hallway #13: 4 x 1 at (61, 0), Hallway #14: 4 x 4 at (26, 8), Hallway #15: 3 x 10 at (2, 0), Hallway #16: 5 x 4 at (41, 7), Hallway #17: 19 x 4 at (39, 3), Hallway #18: 4 x 1 at (20, 0), Hallway #19: 4 x 13 at (49, 17), Hallway #20: 11 x 3 at (53, 20), Hallway #21: 7 x 3 at (17, 12), Hallway #22: 4 x 5 at (27, 0), Hallway #23: 3 x 7 at (57, 23), Hallway #24: 2 x 3 at (5, 2), Hallway #25: 3 x 4 at (64, 9)]
+
+[Room #0: 25 x 9 at (14, 17), Room #1: 8 x 5 at (33, 7), Room #2: 7 x 7 at (2, 10), Room #3: 17 x 7 at (7, 1), Room #4: 12 x 6 at (56, 13), Room #5: 24 x 5 at (24, 12), Room #6: 10 x 8 at (60, 1), Hallway #7: 3 x 4 at (32, 26), Hallway #8: 9 x 3 at (24, 5), Hallway #9: 3 x 9 at (14, 8), Hallway #10: 8 x 3 at (48, 14), Hallway #11: 4 x 7 at (35, 0), Hallway #12: 2 x 4 at (0, 14), Hallway #13: 4 x 1 at (62, 0), Hallway #14: 3 x 4 at (24, 8), Hallway #15: 5 x 4 at (9, 13), Hallway #16: 2 x 3 at (33, 4), Hallway #17: 4 x 10 at (3, 0), Hallway #18: 10 x 3 at (50, 2), Hallway #19: 4 x 11 at (62, 19), Hallway #20: 17 x 3 at (39, 21), Hallway #21: 3 x 4 at (53, 17), Hallway #22: 11 x 3 at (24, 0), Hallway #23: 3 x 5 at (11, 8), Hallway #24: 3 x 4 at (64, 9)]

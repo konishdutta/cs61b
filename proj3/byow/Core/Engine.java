@@ -8,12 +8,17 @@ public class Engine {
     /* Feel free to change the width and height. */
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    public enum gameState {
+        MENU, SEEDING, PLAY
+    }
+    public gameState currState = gameState.MENU;
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+
     }
 
     /**
@@ -46,24 +51,31 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
         input = input.toUpperCase();
-        long randString = 0;
+        long res = 0;
         for (int i = 0; i < input.length(); i++) {
-            if (i == 0 && input.charAt(i) != 'N') {
-                break;
+            switch (currState) {
+                case SEEDING:
+                    res = res * 10 + input.charAt(i);
+                    break;
+                case PLAY:
+                    break;
             }
-            if (Character.isDigit(input.charAt(i))) {
-                int nextNum = input.charAt(i) - '0';
-                System.out.println(nextNum);
-                System.out.println(randString);
-                randString = (randString * 10) + nextNum;
-                System.out.println(randString);
-            }
+            processKey(input.charAt(i));
         }
-        System.out.println(randString);
-        World w = new World(randString);
 
-        TETile[][] finalWorldFrame = w.randomLayout();;
-        //System.out.println(TETile.toString(finalWorldFrame));
+        World w = new World(res);
+        TETile[][] finalWorldFrame = w.randomLayout();
         return finalWorldFrame;
+    }
+    public void processKey(char c) {
+        switch(c) {
+            case 'N':
+                currState = gameState.SEEDING;
+                break;
+            case 'P':
+                currState = gameState.PLAY;
+                break;
+            default: break;
+        }
     }
 }

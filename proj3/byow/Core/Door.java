@@ -57,6 +57,10 @@ public class Door extends Wall {
             }
             currComp = w.getComponentByPosition(curr);
         }
+        //minimum size for a 2 spanned hall
+        if (currSize <= 2) {
+            randSpan = 1;
+        }
         Hallway res = new Hallway(w, randSpan, currSize, d);
         res.setPosition(curr);
         return res;
