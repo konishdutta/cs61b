@@ -1,3 +1,4 @@
+/*
 package byow.Core;
 
 public class VerticalHallway extends Room {
@@ -89,3 +90,4 @@ public class VerticalHallway extends Room {
     }
 
 }
+*/

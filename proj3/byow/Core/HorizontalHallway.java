@@ -1,3 +1,4 @@
+/*
 package byow.Core;
 
 public class HorizontalHallway extends Room {
@@ -85,3 +86,4 @@ public class HorizontalHallway extends Room {
         world().drawAllDoors();
     }
 }
+*/

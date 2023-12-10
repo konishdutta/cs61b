@@ -11,9 +11,13 @@ public class ut {
         Direction res = null;
         switch(d) {
             case NORTH: res = Direction.EAST;
+            break;
             case EAST: res = Direction.SOUTH;
+            break;
             case SOUTH: res = Direction.WEST;
+            break;
             case WEST: res = Direction.NORTH;
+            break;
         }
         return res;
     }
@@ -21,9 +25,13 @@ public class ut {
         Direction res = null;
         switch(d) {
             case NORTH: res = Direction.WEST;
+            break;
             case WEST: res = Direction.SOUTH;
+            break;
             case SOUTH: res = Direction.EAST;
+            break;
             case EAST: res = Direction.NORTH;
+            break;
         }
         return res;
     }
@@ -31,16 +39,16 @@ public class ut {
         Direction res = null;
         switch(d) {
             case NORTH: res = Direction.SOUTH;
+            break;
             case WEST: res = Direction.EAST;
+            break;
             case SOUTH: res = Direction.NORTH;
+            break;
             case EAST: res = Direction.WEST;
+            break;
         }
         return res;
     }
 
-    public static int randNum(int start, int end) {
-        int res = start + World.RANDOM.nextInt(end - start);
-        return res;
-    }
 
 }

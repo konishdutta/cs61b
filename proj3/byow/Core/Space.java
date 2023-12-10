@@ -1,5 +1,5 @@
 package byow.Core;
-
+import java.util.*;
 import byow.TileEngine.Tileset;
 
 public class Space {
@@ -8,18 +8,16 @@ public class Space {
     private int id;
     private Position position;
     private World world;
+    private Set<Space> adjSpaces;
 
     public Space(World w, int height, int width) {
-        if (height != 0) {
-            this.id = w.spaceList.size();
-            w.spaceList.add(this);
-        } else {
-            w.proposedDoors.add((Door) this);
-        }
         this.height = height;
         this.width = width;
         this.position = null;
         this.world = w;
+        this.adjSpaces = new HashSet<>();
+        this.id = w.spaceList.size();
+        w.spaceList.add(this);
     }
 
     public int height() {
@@ -50,94 +48,136 @@ public class Space {
     public World world() {
         return world;
     }
-    public boolean checkPosition(Space s, Position p) {
-        for (int h = 0; h < this.height; h++) {
-            for (int w = 0; w < this.width; w++) {
-                if (p.x() + w >= Engine.WIDTH ||
-                        p.y() + h >= Engine.HEIGHT ||
-                        world.map[p.x() + w][p.y() + h] != Tileset.NOTHING) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
     public void draw() {
-        Position p = getPosition();
-        int x = p.x();
-        int y = p.y();
+        Position bottomLeft = getPosition();
+        int x = bottomLeft.x();
+        int y = bottomLeft.y();
         // Draw everything as a floor
         for (int h = 0; h < this.height(); h++) {
             for (int w = 0; w < this.width(); w++) {
-                world().map[x + w][y + h] = Tileset.FLOOR;
+                Position curr = new Position(x + w, y + h);
+                Floor f = new Floor(curr, this);
+                world().build(f);
             }
         }
         // Draw the walls
         for (int top = 0; top < this.width(); top++) {
-            world().map[x + top][y] = Tileset.WALL;
-            world().map[x + top][y + this.height() - 1] = Tileset.WALL;
+            Position b = new Position(x + top, y);
+            Position t = new Position(x + top, y + this.height() - 1);
+            Wall bottomW = new Wall(b, this);
+            Wall topW = new Wall(t, this);
+            world().build(bottomW);
+            world().build(topW);
         }
         for (int side = 0; side < this.height(); side++) {
-            world().map[x][y + side] = Tileset.WALL;
-            world().map[x + this.width() - 1][y + side] = Tileset.WALL;
+            Position l = new Position(x, y + side);
+            Position r = new Position(x + this.width() - 1, y + side);
+            Wall leftW = new Wall(l, this);
+            Wall rightW = new Wall(r, this);
+            world().build(leftW);
+            world().build(rightW);
         }
-    }
-    public Door findDoor() {
-        // finds a random door on some non-corner wall
-        Door candidate = null;
-        int currX = this.position.x();
-        int currY = this.position.y();
-        boolean safeDoor = false;
-        while (!safeDoor) {
-            world.proposedDoors.clear();
-            // randomly generate S, N, W, E direction
-            int direction = (1 + World.RANDOM.nextInt(2)) * (World.RANDOM.nextBoolean() ? -1 : 1);
-            // find some random offset for a non-corner tile
-            int randWidth = 1 + World.RANDOM.nextInt(this.width - 3);
-            int randHeight = 1 + World.RANDOM.nextInt(this.height - 3);
-            Position doorPos = null;
-            switch (direction) {
-                case -1:
-                    doorPos = new Position(currX + randWidth, currY);
-                    break;
-                case 1:
-                    doorPos = new Position(currX + randWidth, currY + this.height - 1);
-                    break;
-                case -2:
-                    doorPos = new Position(currX, currY + randHeight);
-                    break;
-                case 2:
-                    doorPos = new Position(currX + this.width - 1, currY + randHeight);
-                    break;
-            }
-            candidate = new Door(world, doorPos, this, direction);
-            safeDoor = candidate.safe();
-        }
-        boolean doubleDoor = false;
-        if (world.proposedDoors.size() > 1) {
-            doubleDoor = true;
-        }
-        world.drawAllDoors();
-        if (doubleDoor) {
-            return null;
-        }
-        return candidate;
     }
 
-    public boolean isCorner(Position p) {
-        Position bottomLeft = position;
-        Position bottomRight = new Position(position.x() + width - 1, position.y());
-        Position topLeft = new Position(position.x(), position.y() + height - 1);
-        Position topRight = new Position(position.x() + width - 1, position.y() + height - 1);
-        if (p.equals(bottomLeft) || p.equals(bottomRight)|| p.equals(topLeft) || p.equals(topRight)) {
-            return true;
-        }
-        return false;
+    public void connect(Space s) {
+        s.adjSpaces.add(this);
+        this.adjSpaces.add(s);
     }
+    public Set<Space> dfs() {
+        Set<Space> visited = new HashSet<>();
+        dfsHelper(visited);
+        return visited;
+    }
+    private void dfsHelper(Set<Space> visited) {
+        if (visited.contains(this)) {
+            return;
+        }
+        visited.add(this);
+        for (Space s : adjSpaces) {
+            s.dfsHelper(visited);
+        }
+    }
+    public Position getWallStart(ut.Direction d) {
+        Position start = null;
+        switch(d) {
+            case NORTH:
+                start = new Position(position.x() + 1, position.y() + height - 1);
+                break;
+            case SOUTH:
+                start = new Position(position.x() + width - 2, position.y());
+                break;
+            case EAST:
+                start = new Position(position.x() + width - 1, position.y() + height - 2);
+                break;
+            case WEST:
+                start = new Position(position.x(), position.y() + 1);
+                break;
+        }
+        return start;
+    }
+
+    public Position quickHall(ut.Direction d, Set<Space> visited) {
+        int iter = 0;
+        switch(d) {
+            case NORTH, SOUTH:
+                iter = width;
+                break;
+            case EAST, WEST:
+                iter = height;
+                break;
+        }
+        Space currNeighbor = null;
+        int count = 0;
+        Position currPos = getWallStart(d);
+        for (int i = 0; i < iter - 2; i++) {
+            Space newNeighbor = world().neighbor(currPos, d);
+            if (newNeighbor != null &&
+                    newNeighbor.equals(currNeighbor) && !visited.contains(newNeighbor)) {
+                count += 1;
+            }
+            if (count == 2) {
+                currPos = currPos.moveDirection(ut.counterclock(d));
+                return currPos;
+            }
+            currNeighbor = newNeighbor;
+            currPos = currPos.moveDirection(ut.clockwise(d));
+        }
+        return null;
+    }
+    public Hallway checkWallsForHalls(Set<Space> visited) {
+        ut.Direction d = ut.Direction.NORTH;
+        for (int i = 0; i < 4; i++) {
+            Position p = quickHall(d, visited);
+            if (p != null) {
+                Wall oldWall = (Wall) world.getComponentByPosition(p);
+                Door newDoor = new Door(oldWall);
+                Hallway newHall = newDoor.launchHallway(d, 1, Engine.WIDTH);
+                return newHall;
+            }
+            d = ut.clockwise(d);
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + " #" +
                 id + ": " + width + " x " + height +
                 " at " + this.position;
+    }
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
+    @Override
+    public boolean equals(Object c) {
+        if (c == null) {
+            return false;
+        } else if (c.getClass() != this.getClass()) {
+            return false;
+        } else {
+            Space comp = (Space) c;
+            return comp.id == id;
+        }
     }
 }

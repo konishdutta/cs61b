@@ -1,86 +1,66 @@
 package byow.Core;
 
+import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-public class Door extends Space {
-    Space parent;
-    int orient;
-    public Door(World w, Position p, Space parent, int orient) {
-        super(w, 0, 0);
-        this.setPosition(p);
-        this.parent = parent;
-        this.orient = orient;
+import java.util.ArrayList;
+import java.util.List;
 
-    }
-    public void draw() {
-        int x = getPosition().x();
-        int y = getPosition().y();
-        world().map[x][y] = Tileset.FLOOR;
-    }
-// Safe will create double doors when it detects them
-    public boolean safe() {
-        int x = getPosition().x();
-        int y = getPosition().y();
-        Position check = null;
-        boolean sweep = false; //sweep checks if the space above is empty
-        switch(Math.abs(orient)) {
-            case 1:
-                check = new Position(x, y + orient);
-                sweep = check.checkRow(1, world());
-                break;
-            case 2:
-                check = new Position(x + (orient / 2), y);
-                sweep = check.checkCol(1, world());
-                break;
-        }
-        //check for out of bounds
-        if (check.outOfBounds()) {
-            return false;
-        }
-        if (getPosition().isCorner(world(), "default")) {
-            return false;
-        }
-        Space whatsThere = check.returnSpace(world());
-        if (whatsThere == null) {
-            return sweep;
-        }
-        //it's not empty so there is a corner or wall. double door if so.
-        String direct = "";
-        if (Math.abs(orient) == 2) {
-            direct = "horizontal";
-        } else {
-            direct = "vertical";
-        }
-        if (!check.isCorner(world(), direct)) {
-            Door doubleDoor = new Door(world(), check, whatsThere, this.orient * -1);
-            System.out.println(world().map);
-            return true;
-        }
-        return false;
+public class Door extends Wall {
+    Space adjoiningParent;
+    TETile r = Tileset.FLOOR;
+    public Door(Wall wall) {
+        super(wall.position(), wall.parent());
+        this.setRep(r);
+        world().removeWall(wall);
+        world().addDoor(this);
     }
 
-    public Space buildHallway(int n) {
-        int cornerY = parent.getPosition().y();
-        int cornerX = parent.getPosition().x() + parent.width() - 1;
-        System.out.println("c:" + cornerY);
-        int randWidth;
-        // if a door is on the edge, we want to prevent 2-sized halls
-        if (this.getPosition().x() + 1 == cornerX || this.getPosition().y() - 1 == cornerY) {
-            randWidth = 3;
-        } else {
-            randWidth = 3 + World.RANDOM.nextInt(2);
-        }
-        Space hall = null;
+    public void doubleDoor(ut.Direction d, int width) {
+        Position curr = position();
+        for (int i = 0; i < width; i++) {
+            //be simple, make a new wall there, and then turn that into a door
+            Component currC = world().getComponentByPosition(curr);
+            Space currParent = currC.parent();
+            Wall currWall = new Wall(curr, currParent);
+            Door currDoor = new Door(currWall);
 
-        switch(Math.abs(orient)) {
-            case 1:
-                hall = new VerticalHallway(world(), randWidth, n, orient, this);
-                break;
-            case 2:
-                hall = new HorizontalHallway(world(), randWidth, n, orient / 2, this);
-                break;
+            Position newP = curr.moveDirection(d);
+            Position pastP = newP.moveDirection(d);
+            Component newC = world().getComponentByPosition(newP);
+            Space newParent = newC.parent();
+            if (!newP.outOfBounds() && !pastP.outOfBounds() && !world().getComponentByPosition(pastP).nothing()) {
+
+                Wall newWall = new Wall(newP, newParent);
+                Door newDoor = new Door(newWall);
+            }
+            this.adjoiningParent = newParent;
+            currParent.connect(newParent);
+            curr = curr.moveDirection(ut.clockwise(d));
         }
-        return hall;
     }
+
+    public Hallway launchHallway(ut.Direction d, int span, int size) {
+        World w = world();
+        int randSpan = w.randNum(1, span + 1);
+        if (size == 0) {
+            size = w.randNum(5, Engine.HEIGHT); // pick a random size of the hallway
+        }
+        Position curr = position();
+        Component currComp = w.getComponentByPosition(curr);
+        int currSize = 0;
+        while (currSize < size && currComp.probeForHallSpan(d, randSpan) == randSpan) {
+            currSize += 1;
+            curr = curr.moveDirection(d);
+            if (curr.outOfBounds()) {
+                break;
+            }
+            currComp = w.getComponentByPosition(curr);
+        }
+        Hallway res = new Hallway(w, randSpan, currSize, d);
+        res.setPosition(curr);
+        return res;
+    }
+
 
 }

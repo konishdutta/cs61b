@@ -15,11 +15,37 @@ public class Position {
     public int y() {
         return y;
     }
-    public static Position randomPosition() {
-        Position newPosition = new Position(
-                World.RANDOM.nextInt(Engine.WIDTH),
-                World.RANDOM.nextInt(Engine.HEIGHT));
-        return newPosition;
+    //directional pivots
+    public Position north() {
+        Position res = new Position(x, y + 1);
+        return res;
+    }
+    public Position south() {
+        Position res = new Position(x, y - 1);
+        return res;
+    }
+    public Position east() {
+        Position res = new Position(x - 1, y);
+        return res;
+    }
+    public Position west() {
+        Position res = new Position(x + 1, y);
+        return res;
+    }
+
+    public Position moveDirection(ut.Direction d) {
+        Position res = null;
+        switch(d) {
+            case NORTH: res = new Position(x, y + 1);
+            break;
+            case SOUTH: res = new Position(x, y - 1);
+            break;
+            case EAST: res = new Position(x + 1, y);
+            break;
+            case WEST: res = new Position(x - 1, y);
+            break;
+        }
+        return res;
     }
 
     //give a position and return the room that's there
@@ -128,5 +154,9 @@ public class Position {
             Position comp = (Position) c;
             return comp.x == this.x && comp.y == this.y;
         }
+    }
+    @Override
+    public int hashCode() {
+        return x * 100 + y;
     }
 }
