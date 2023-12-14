@@ -236,7 +236,7 @@ public class World {
         }
         safe = false;
         double distance = 0.0;
-        while (!safe || distance < Engine.WIDTH / 2) {
+        while (!safe || distance < Engine.WIDTH / 4) {
             int nextRand = randNum(0, wallArray.size());
             exit = wallArray.get(nextRand);
             safe = !exit.isCorner();
@@ -271,7 +271,7 @@ public class World {
 
     public static void main(String[] args) {
         long n1 = 455857754086099036L;
-        World w = new World(n1);
+        World w = new World(1281935452);
         w.startRandomGame();
         System.out.println(TETile.toString(w.map));
 

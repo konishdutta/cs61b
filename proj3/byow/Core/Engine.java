@@ -10,6 +10,7 @@ import java.util.Random;
 public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
+    private InputSource inputSource;
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
     public World world;
@@ -45,6 +46,9 @@ public class Engine {
         StdDraw.show();
     }
     public void drawSeed() {
+        if (!(inputSource instanceof KeyboardInputSource)) {
+            return;
+        }
         StdDraw.clear(Color.BLACK);
         Font font = new Font("DialogInput", Font.BOLD, 60);
         StdDraw.setPenColor(Color.ORANGE);
@@ -58,7 +62,6 @@ public class Engine {
         StdDraw.show();
     }
     public void play() {
-        ter.initialize(WIDTH, HEIGHT);
         this.world = new World(seed);
         world.startRandomGame();
         run();
@@ -67,7 +70,7 @@ public class Engine {
     public void run() {
         TETile[][] frame = world.getMap();
         //ter.renderSimpleLight(frame, world, 5);
-        ter.renderRayLight(frame, world, 5);
+        //ter.renderRayLight(frame, world, 5);
         //ter.renderFrame(frame);
     }
 
@@ -79,7 +82,7 @@ public class Engine {
     public void interactWithKeyboard() {
         ter.initialize(1, 1);
         drawMenu();
-        KeyboardInputSource inputSource = new KeyboardInputSource();
+        this.inputSource = new KeyboardInputSource();
         while (currState != gameState.EXIT) {
             if (inputSource.possibleNextInput()) {
                 char key = inputSource.getNextKey();
@@ -117,7 +120,7 @@ public class Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        StringInputSource inputSource = new StringInputSource(input);
+        this.inputSource = new StringInputSource(input);
         while (inputSource.possibleNextInput()) {
             char key = inputSource.getNextKey();
             processKey(key);

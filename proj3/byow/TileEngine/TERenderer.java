@@ -182,6 +182,7 @@ public class TERenderer {
     }
 
     public void prepLights(World w) {
+        w.getGold();
 
     }
 
