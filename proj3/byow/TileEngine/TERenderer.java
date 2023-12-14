@@ -182,7 +182,9 @@ public class TERenderer {
     }
 
     public void prepLights(World w) {
-        w.getGold();
+        for (LightSource g : w.getGold()) {
+            Color currColor = new Color(g.r(), g.g(), g.b());
+        }
 
     }
 

@@ -33,6 +33,22 @@ public class World {
             }
         }
     }
+    public void reset() {
+        this.SEED = RANDOM.nextInt();
+        this.RANDOM = new Random(SEED);
+        this.spaceList = new ArrayList<>();
+        this.doors = new HashSet<>();
+        this.walls = new HashSet<>();
+        this.pc = new HashMap<>();
+        this.goldenString = new HashSet<>();
+        for (int x = 0; x < Engine.WIDTH; x += 1) {
+            for (int y = 0; y < Engine.HEIGHT; y += 1) {
+                Position p = new Position(x, y);
+                Nothing n = new Nothing(p, this);
+                build(n);
+            }
+        }
+    }
     public void build(Component c) {
         Position p = c.position();
         map[p.x()][p.y()] = c.rep();
@@ -187,6 +203,10 @@ public class World {
             generateRandomDoor();
         }
         while (spaceList.get(0).dfs().size() != spaceList.size()) {
+            if (spaceList.size() > 50) {
+                reset();
+                randomLayout();
+            }
             int currSize = spaceList.size();
             curatedHallway();
             if (spaceList.size() == currSize) {
@@ -271,14 +291,16 @@ public class World {
 
     public static void main(String[] args) {
         long n1 = 455857754086099036L;
-        World w = new World(1281935452);
+        World w = new World(-1629101397);
         w.startRandomGame();
         System.out.println(TETile.toString(w.map));
-
+/*
         long n2 = 5197880843569031643L;
         w = new World(n2);
         w.startRandomGame();
         System.out.println(TETile.toString(w.map));
+
+ */
 
     }
 }

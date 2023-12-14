@@ -21,7 +21,7 @@ public class Engine {
     private int seed = 0;
     public static void main(String[] args) {
         Engine e = new Engine();
-        e.interactWithInputString("n455857754086099036s");
+        e.interactWithInputString("n4805805086739915435s");
         //e.interactWithKeyboard();
     }
     public void exit() {
@@ -62,16 +62,22 @@ public class Engine {
         StdDraw.show();
     }
     public void play() {
+
         this.world = new World(seed);
+        System.out.println(seed);
         world.startRandomGame();
-        run();
+        if (inputSource instanceof KeyboardInputSource) {
+            ter.initialize(WIDTH, HEIGHT);
+            run();
+        }
+
     }
 
     public void run() {
         TETile[][] frame = world.getMap();
         //ter.renderSimpleLight(frame, world, 5);
         //ter.renderRayLight(frame, world, 5);
-        //ter.renderFrame(frame);
+        ter.renderFrame(frame);
     }
 
     /**
@@ -125,6 +131,7 @@ public class Engine {
             char key = inputSource.getNextKey();
             processKey(key);
             }
+        System.out.println(TETile.toString(world.getMap()));
         return world.getMap();
     }
     public void processKey(char c) {
