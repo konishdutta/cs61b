@@ -21,6 +21,7 @@ public class TERenderer {
     private int xOffset;
     private int yOffset;
     private boolean[][] isFov;
+    private double [][] lightGrid;
 
     /**
      * Same functionality as the other initialization method. The only difference is that the xOff
@@ -180,7 +181,7 @@ public class TERenderer {
         }
     }
 
-    public void prepLights() {
+    public void prepLights(World w) {
 
     }
 

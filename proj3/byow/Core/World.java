@@ -265,32 +265,20 @@ public class World {
     }
     public void startRandomGame() {
         randomLayout();
-        findAppropriateString();
+        //findAppropriateString();
         placeRandomAvatar();
     }
 
     public static void main(String[] args) {
-        long n1 = 7685817615627686380L;
-        long n2 = 865562189400100566L;
+        long n1 = 455857754086099036L;
         World w = new World(n1);
         w.startRandomGame();
         System.out.println(TETile.toString(w.map));
 
-        n2 = 0;
+        long n2 = 5197880843569031643L;
         w = new World(n2);
         w.startRandomGame();
         System.out.println(TETile.toString(w.map));
-        Random s = new Random(n2);
-        for (int i = 0; i < 1000; i++) {
-            long sd = s.nextLong();
-            System.out.println(sd);
-            w = new World(sd);
-            w.startRandomGame();
-        }
 
-        w = new World(1645623);
-        w.randomLayout();
-        System.out.println(TETile.toString(w.map));
-        System.out.println(w.spaceList);
     }
 }
