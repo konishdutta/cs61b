@@ -20,7 +20,8 @@ public class Engine {
     private int seed = 0;
     public static void main(String[] args) {
         Engine e = new Engine();
-        e.interactWithKeyboard();
+        e.interactWithInputString("n455857754086099036s");
+        //e.interactWithKeyboard();
     }
     public void exit() {
         StdDraw.clear(Color.BLACK);
@@ -64,7 +65,6 @@ public class Engine {
     }
 
     public void run() {
-        System.out.println(currState);
         TETile[][] frame = world.getMap();
         //ter.renderSimpleLight(frame, world, 5);
         ter.renderRayLight(frame, world, 5);
@@ -116,23 +116,13 @@ public class Engine {
         //
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
-        input = input.toUpperCase();
-        long res = 0;
-        for (int i = 0; i < input.length(); i++) {
-            switch (currState) {
-                case SEEDING:
-                    res = res * 10 + input.charAt(i);
-                    break;
-                case PLAY:
-                    break;
-            }
-            processKey(input.charAt(i));
-        }
 
-        World w = new World(res);
-        w.startRandomGame();
-        TETile[][] finalWorldFrame = w.getMap();
-        return finalWorldFrame;
+        StringInputSource inputSource = new StringInputSource(input);
+        while (inputSource.possibleNextInput()) {
+            char key = inputSource.getNextKey();
+            processKey(key);
+            }
+        return world.getMap();
     }
     public void processKey(char c) {
         switch (currState) {
@@ -148,9 +138,8 @@ public class Engine {
         }
     }
     public void seedStrokes(char c) {
-        System.out.println(c);
         switch (Character.toUpperCase(c)) {
-            case 'P':
+            case 'P', 'S':
                 currState = gameState.PLAY;
                 play();
                 break;

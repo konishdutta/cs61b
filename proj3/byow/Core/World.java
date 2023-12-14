@@ -265,7 +265,7 @@ public class World {
     }
     public void startRandomGame() {
         randomLayout();
-        //findAppropriateString();
+        findAppropriateString();
         placeRandomAvatar();
     }
 
