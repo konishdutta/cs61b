@@ -2,6 +2,11 @@ package byow.Core;
 
 import byow.TileEngine.Tileset;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+
 public class Position {
     private int x;
     private int y;
@@ -139,6 +144,14 @@ public class Position {
         }
         return critSum == 1;
     }
+    public double calculateDistance(Position other) {
+        int x1 = this.x;
+        int y1 = this.y;
+        int x2 = other.x;
+        int y2 = other.y;
+        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+    }
+
     @Override
     public String toString() {
         return "(" + x + ", " + y + ")";

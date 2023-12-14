@@ -1,9 +1,12 @@
 package byow.TileEngine;
 
+import byow.Core.*;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class for rendering tiles. You do not need to modify this file. You're welcome
@@ -17,6 +20,7 @@ public class TERenderer {
     private int height;
     private int xOffset;
     private int yOffset;
+    private boolean[][] isFov;
 
     /**
      * Same functionality as the other initialization method. The only difference is that the xOff
@@ -98,4 +102,108 @@ public class TERenderer {
         }
         StdDraw.show();
     }
+
+    public void renderSimpleLight(TETile[][] world, World w, int lightRadius) {
+        Avatar a = w.avatar();
+        Position p = a.position();
+        int ax = p.x();
+        int ay = p.y();
+        int numXTiles = world.length;
+        int numYTiles = world[0].length;
+        StdDraw.clear(new Color(0, 0, 0));
+
+        for (int x = 0; x < numXTiles; x++) {
+            for (int y = 0; y < numYTiles; y++) {
+                if (world[x][y] == null) {
+                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y + " is null.");
+                }
+                double distance = calculateDistance(x, y, ax, ay);
+                double darkeningFactor = calculateDarkeningFactor(distance, lightRadius);
+                TETile litTile = TETile.applyLightingEffect(world[x][y], darkeningFactor);
+                litTile.draw(x + xOffset, y + yOffset);
+            }
+        }
+        StdDraw.show();
+    }
+
+    public void renderRayLight(TETile[][] world, World w, int lightRadius) {
+        this.isFov = new boolean[width][height];
+        Avatar a = w.avatar();
+        Position p = a.position();
+        generateFov(w, lightRadius);
+
+        int ax = p.x();
+        int ay = p.y();
+        int numXTiles = world.length;
+        int numYTiles = world[0].length;
+        StdDraw.clear(new Color(0, 0, 0));
+
+        for (int x = 0; x < numXTiles; x++) {
+            for (int y = 0; y < numYTiles; y++) {
+                if (world[x][y] == null) {
+                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y + " is null.");
+                }
+                Position pos = new Position(x, y);
+                Component c = w.getComponentByPosition(pos);
+
+                if (isFov[x][y]) {
+                    double distance = calculateDistance(x, y, ax, ay);
+                    double darkeningFactor = calculateDarkeningFactor(distance, lightRadius);
+                    TETile litTile = TETile.applyLightingEffect(world[x][y], darkeningFactor);
+                    litTile.draw(x + xOffset, y + yOffset);
+                }
+            }
+        }
+        StdDraw.show();
+    }
+    private double calculateDistance(int x1, int y1, int x2, int y2) {
+        // Implement distance calculation (Euclidean)
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+    private double calculateDarkeningFactor(double distance, int lightRadius) {
+        // Exponential decay factor
+        double decayFactor = 1;
+        double darkening = 1 - Math.exp(-decayFactor * distance / lightRadius);
+        return Math.min(1, Math.max(0, darkening));
+    }
+
+    public void generateFov(World w, int lightRadius) {
+        double angleIncrement = 0.0125 * Math.PI;
+        Position p = w.avatar().position();
+        System.out.println(p);
+        int ax = p.x();
+        int ay = p.y();
+        for (double angle = 0; angle < 2 * Math.PI; angle += angleIncrement) {
+            double dx = Math.cos(angle);
+            double dy = Math.sin(angle);
+            castFov(w, ax, ay, dx, dy, lightRadius);
+        }
+    }
+
+    public void prepLights() {
+
+    }
+
+    private void castFov(World w, int startX, int startY, double dx, double dy, int lightRadius) {
+        double x = startX, y = startY;
+        double distanceTraveled = 0;
+        while (distanceTraveled < lightRadius) {
+            int gridX = (int) Math.round(x);
+            int gridY = (int) Math.round(y);
+            Position p = new Position(gridX, gridY);
+            if (p.outOfBounds()) {
+                break;
+            }
+            if (w.getComponentByPosition(p).wall() && !w.getComponentByPosition(p).door()) {
+                isFov[gridX][gridY] = true;
+                return;
+            }
+            // Mark the tile as lit
+            isFov[gridX][gridY] = true;
+            x += dx;
+            y += dy;
+            distanceTraveled = calculateDistance(gridX, gridY, startX, startY);
+        }
+    }
+
 }

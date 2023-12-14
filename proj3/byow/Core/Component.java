@@ -3,6 +3,8 @@ package byow.Core;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.util.*;
+
 public class Component {
     private Space parent;
     private Position position;
@@ -80,6 +82,45 @@ public class Component {
         }
         return res;
     }
+
+    public List<Position> bfs(Component exit) {
+        Queue<Position> q = new LinkedList<>();
+        Map<Position, Position> parentMap = new HashMap<>();
+        Set<Position> visited = new HashSet<>();
+        Position destination = exit.position();
+        Position curr = this.position();
+        q.add(this.position());
+        parentMap.put(curr, null);
+        visited.add(curr);
+        while (!q.isEmpty()) {
+            curr = q.poll();
+            if (curr.equals(destination)) {
+                return constructPath(parentMap, destination);
+            }
+            if (!curr.outOfBounds() && (world().getComponentByPosition(curr).floor() || world().getComponentByPosition(curr).door())) {
+                for (ut.Direction dir : ut.Direction.values()) {
+                    Position next = curr.moveDirection(dir);
+                    if (!visited.contains(next)) {
+                        q.add(next);
+                        visited.add(next);
+                        parentMap.put(next, curr); // Set the parent of the next position
+                    }
+                }
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Position> constructPath(Map<Position,  Position> map, Position dest) {
+        List<Position> res = new ArrayList<>();
+        Position curr = dest;
+        while (curr != null) {
+            res.add(0, curr);
+            curr = map.get(curr);
+        }
+        return res;
+    }
+
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + " @ " + position.toString();

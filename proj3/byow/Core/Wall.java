@@ -3,6 +3,11 @@ package byow.Core;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 public class Wall extends Component {
     private static final TETile r = Tileset.WALL;
     private int id;
@@ -125,5 +130,18 @@ public class Wall extends Component {
             return 1 + nextWall.probeForDoor(d, span - 1);
         }
     }
-
+    public boolean isCorner() {
+        Position curr = this.position();
+        for (ut.Direction d: ut.Direction.values()) {
+            Position probe = curr.moveDirection(d);
+            if (probe.outOfBounds()) {
+                continue;
+            }
+            Component c = world().getComponentByPosition(probe);
+            if (c instanceof Floor) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

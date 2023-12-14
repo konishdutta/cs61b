@@ -69,6 +69,9 @@ public class TETile {
     public TETile(TETile t, Color textColor) {
         this(t.character, textColor, t.backgroundColor, t.description, t.filepath);
     }
+    public TETile(TETile t, Color textColor, Color backgroundColor) {
+        this(t.character, textColor, backgroundColor, t.description, t.filepath);
+    }
 
 
     /**
@@ -188,5 +191,26 @@ public class TETile {
         }
 
         return copy;
+    }
+    public static TETile applyLightingEffect(TETile t, double darkeningFactor) {
+        Color oldColor = t.textColor;
+        int newRed = darkenColorValue(oldColor.getRed(), darkeningFactor);
+        int newGreen = darkenColorValue(oldColor.getGreen(), darkeningFactor);
+        int newBlue = darkenColorValue(oldColor.getBlue(), darkeningFactor);
+
+        Color oldBgColor = t.backgroundColor;
+        int bgRed = darkenColorValue(oldBgColor.getRed(), darkeningFactor);
+        int bgGreen = darkenColorValue(oldBgColor.getGreen(), darkeningFactor);
+        int bgBlue = darkenColorValue(oldBgColor.getBlue(), darkeningFactor);
+
+        Color c = new Color(newRed, newGreen, newBlue);
+        Color bg = new Color(bgRed, bgGreen, bgBlue);
+
+        return new TETile(t, c, bg);
+    }
+
+    private static int darkenColorValue(int value, double darkeningFactor) {
+        int newValue = (int) (value * (1 - darkeningFactor));
+        return Math.min(255, Math.max(0, newValue));
     }
 }

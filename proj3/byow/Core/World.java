@@ -13,6 +13,9 @@ public class World {
     public Set<Door> doors;
     public Set<Wall> walls;
     public HashMap<Position, Component> pc;
+    private Avatar avatar;
+    private Component avatarComp;
+    private Set<Ariane> goldenString;
 
     public World(long SEED) {
         this.SEED = SEED;
@@ -21,6 +24,7 @@ public class World {
         this.doors = new HashSet<>();
         this.walls = new HashSet<>();
         this.pc = new HashMap<>();
+        this.goldenString = new HashSet<>();
         for (int x = 0; x < Engine.WIDTH; x += 1) {
             for (int y = 0; y < Engine.HEIGHT; y += 1) {
                 Position p = new Position(x, y);
@@ -131,8 +135,6 @@ public class World {
             Position[] wallData = res.returnWallStarts();
             res.bulldozeForDoors(wallData);
             for (Door d: doors) {
-                //System.out.println(TETile.toString(map));
-                //System.out.println(d);
                 build(d);
             }
         }
@@ -174,9 +176,13 @@ public class World {
         return res;
     }
 
-    public TETile[][] randomLayout() {
+    public TETile[][] getMap() {
+        return map;
+    }
+
+    public void randomLayout() {
         generateRandomRooms();
-        int randHallCount = randNum(5, 30);
+        int randHallCount = randNum(5, 20);
         for (int i = 0; i < randHallCount; i++) {
             generateRandomDoor();
         }
@@ -187,18 +193,102 @@ public class World {
                 generateRandomDoor();
             }
         }
-        return map;
     }
 
+    public void placeRandomAvatar() {
+        while (avatar == null) {
+            int randInt = randNum(0, spaceList.size());
+            Space randSpace = spaceList.get(randInt);
+            Position botLeft = randSpace.getPosition();
+            Position start = botLeft.moveDirection(ut.Direction.NORTH).moveDirection(ut.Direction.EAST);
+            if (!start.outOfBounds()) {
+                avatarComp = getComponentByPosition(start);
+                this.avatar = new Avatar(start, this);
+                build(avatar);
+            }
+        }
+    }
+    public Avatar avatar() {
+        return avatar;
+    }
+
+    public void moveAvatar(ut.Direction d) {
+        Position curr = avatar.position();
+        Position target = curr.moveDirection(d);
+        if (!target.outOfBounds() &&
+                (getComponentByPosition(target) instanceof Floor || getComponentByPosition(target) instanceof Door)) {
+            build(avatarComp);
+            avatarComp = getComponentByPosition(target);
+            avatar = new Avatar(target, this);
+            build(avatar);
+        }
+    }
+
+    public void findAppropriateString() {
+        boolean safe = false;
+        List<Wall> wallArray = new ArrayList<>(walls);
+        Wall entry = null;
+        Wall exit = null;
+        while (!safe) {
+            int nextRand = randNum(0, wallArray.size());
+            entry = wallArray.get(nextRand);
+            safe = !entry.isCorner();
+        }
+        safe = false;
+        double distance = 0.0;
+        while (!safe || distance < Engine.WIDTH / 2) {
+            int nextRand = randNum(0, wallArray.size());
+            exit = wallArray.get(nextRand);
+            safe = !exit.isCorner();
+            distance = exit.position().calculateDistance(entry.position());
+        }
+        LockedDoor newDoor1 = new LockedDoor(entry);
+        LockedDoor newDoor2 = new LockedDoor(exit);
+        build(newDoor1);
+        build(newDoor2);
+        Position start = entry.position();
+        Component startC = getComponentByPosition(start);
+        List<Position> stringTree = startC.bfs(exit);
+        for (Position p : stringTree) {
+            Component currC = getComponentByPosition(p);
+            Space s = currC.parent();
+            Ariane a = new Ariane(p, s);
+            goldenString.add(a);
+            build(a);
+        }
+        build(newDoor1);
+        build(newDoor2);
+    }
+
+    public Set<Ariane> getGold() {
+        return goldenString;
+    }
+    public void startRandomGame() {
+        randomLayout();
+        findAppropriateString();
+        placeRandomAvatar();
+    }
 
     public static void main(String[] args) {
         long n1 = 7685817615627686380L;
         long n2 = 865562189400100566L;
         World w = new World(n1);
-        w.randomLayout();
+        w.startRandomGame();
         System.out.println(TETile.toString(w.map));
 
+        n2 = 0;
         w = new World(n2);
+        w.startRandomGame();
+        System.out.println(TETile.toString(w.map));
+        Random s = new Random(n2);
+        for (int i = 0; i < 1000; i++) {
+            long sd = s.nextLong();
+            System.out.println(sd);
+            w = new World(sd);
+            w.startRandomGame();
+        }
+
+        w = new World(1645623);
         w.randomLayout();
         System.out.println(TETile.toString(w.map));
         System.out.println(w.spaceList);
