@@ -21,16 +21,18 @@ public class Engine {
     public enum gameState {
         MENU, SEEDING, PLAY, EXIT, LOAD, LISTEN
     }
+    private boolean zeusMode = false;
+    public boolean stringMode = true;
     public gameState currState = gameState.MENU;
     private int seed = 0;
     public static void main(String[] args) {
         Engine e = new Engine();
         //e.interactWithInputString("n4805805086739915435s");
-        //e.interactWithInputString("n7193300625454684331saaawasdaawd:q");
+        //e.interactWithInputString("lwsd");
         e.interactWithKeyboard();
     }
     public void exit() {
-        if (inputSource instanceof KeyboardInputSource) {
+        if (stringMode == false) {
             StdDraw.clear(Color.BLACK);
             StdDraw.show();
             System.exit(0);
@@ -53,7 +55,7 @@ public class Engine {
         StdDraw.show();
     }
     public void drawSeed() {
-        if (!(inputSource instanceof KeyboardInputSource)) {
+        if (stringMode == true) {
             return;
         }
         StdDraw.clear(Color.BLACK);
@@ -75,7 +77,7 @@ public class Engine {
 
     }
     public void init() {
-        if (inputSource instanceof KeyboardInputSource) {
+        if (stringMode == false) {
             ter.initialize(WIDTH, HEIGHT);
             run();
         }
@@ -86,14 +88,18 @@ public class Engine {
         //ter.renderSimpleLight(frame, world, 5);
         TETile[][] frame = world.getMap();
         while (!inputSource.possibleNextInput()
-                && inputSource instanceof KeyboardInputSource) {
-            ter.renderRayLight(frame, world, 40);
-            try {
-                Random random = new Random();
-                int sleep = 100 + random.nextInt(25);
-                Thread.sleep(sleep);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                && stringMode == false) {
+            if (!zeusMode) {
+                ter.renderRayLight(frame, world);
+                try {
+                    Random random = new Random();
+                    int sleep = 100 + random.nextInt(25);
+                    Thread.sleep(sleep);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            } else {
+                ter.renderFrame(frame);
             }
 
         }
@@ -106,6 +112,7 @@ public class Engine {
      */
 
     public void interactWithKeyboard() {
+        stringMode = false;
         ter.initialize(1, 1);
         drawMenu();
         this.inputSource = new KeyboardInputSource();
@@ -197,8 +204,10 @@ public class Engine {
                 currState = gameState.MENU;
                 interactWithInputString(commands);
                 currState = gameState.PLAY;
-                inputSource = new KeyboardInputSource();
-                init();
+                if (stringMode == false) {
+                    inputSource = new KeyboardInputSource();
+                    init();
+                }
             }
             catch (IOException e) {
             }
@@ -250,6 +259,10 @@ public class Engine {
                 break;
             case 'D':
                 world.moveAvatar(Ut.Direction.EAST);
+                run();
+                break;
+            case 'Z':
+                zeusMode = !zeusMode;
                 run();
                 break;
             case ':':

@@ -131,7 +131,7 @@ public class TERenderer {
         StdDraw.show();
     }
 
-    public void renderRayLight(TETile[][] world, World w, int lightRadius) {
+    public void renderRayLight(TETile[][] world, World w) {
         this.isFov = new boolean[width][height];
         this.fov = new double[width][height];
         Avatar a = w.avatar();
@@ -139,7 +139,7 @@ public class TERenderer {
         prepLights(w);
         blendLights();
         flicker();
-        generateFov2(w, lightRadius);
+        generateFov2(w);
         //generateFov(w, lightRadius);
 
         int ax = p.x();
@@ -219,7 +219,7 @@ public class TERenderer {
         }
     }
 
-    public void generateFov2(World w, int lightRadius) {
+    public void generateFov2(World w) {
         double angleIncrement = 0.000125 * Math.PI;
         Position p = w.avatar().position();
         int ax = p.x();
