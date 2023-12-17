@@ -5,9 +5,7 @@ import byow.TileEngine.TETile;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Random;
@@ -33,8 +31,10 @@ public class Engine {
         e.interactWithKeyboard();
     }
     public void exit() {
-        StdDraw.clear(Color.BLACK);
-        StdDraw.show();
+        if (inputSource instanceof KeyboardInputSource) {
+            StdDraw.clear(Color.BLACK);
+            StdDraw.show();
+        }
         System.exit(0);
     }
     public void drawMenu() {
@@ -146,11 +146,9 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        System.out.println(input);
         this.inputSource = new StringInputSource(input);
         while (inputSource.possibleNextInput()) {
             char key = inputSource.getNextKey();
-            System.out.println(key);
             processKey(key);
             }
         System.out.println(TETile.toString(world.getMap()));
@@ -197,7 +195,6 @@ public class Engine {
                 commands = commands.substring(0, commands.length()-2);
                 save = new History();
                 save.addCommands(commands);
-                System.out.println(commands);
                 currState = gameState.MENU;
                 interactWithInputString(commands);
                 currState = gameState.PLAY;
