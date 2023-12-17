@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class History implements Serializable {
-    private String commands = "N";
+    private String commands = "";
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static final File SAVEFILE = Paths.get(CWD.getPath(), "savefile.txt").toFile();
 

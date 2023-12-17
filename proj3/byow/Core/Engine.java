@@ -27,11 +27,14 @@ public class Engine {
     private int seed = 0;
     public static void main(String[] args) {
         Engine e = new Engine();
-        //e.interactWithInputString("n4805805086739915435s");
+        //e.interactWithInputString("n7193300625454684331saaawasdaawdwsd");
+        //e.interactWithInputString("n7193300625454684331saaawasdaawd:q");
+        //e.interactWithInputString("lwsd");
         //e.interactWithInputString("lwsd");
         e.interactWithKeyboard();
     }
     public void exit() {
+        save.save();
         if (stringMode == false) {
             StdDraw.clear(Color.BLACK);
             StdDraw.show();
@@ -83,6 +86,7 @@ public class Engine {
         }
     }
 
+
     public void run() {
 
         //ter.renderSimpleLight(frame, world, 5);
@@ -112,6 +116,8 @@ public class Engine {
      */
 
     public void interactWithKeyboard() {
+        currState = gameState.MENU;
+        loadSave();
         stringMode = false;
         ter.initialize(1, 1);
         drawMenu();
@@ -145,6 +151,11 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
+        currState = gameState.MENU;
+        loadSave();
+        if (Character.toUpperCase(input.charAt(0)) == 'L') {
+            input = save.getCommands() + input.substring(1);
+        }
         this.inputSource = new StringInputSource(input);
         while (inputSource.possibleNextInput()) {
             char key = inputSource.getNextKey();
@@ -154,12 +165,11 @@ public class Engine {
         return world.getMap();
     }
     public void processKey(char c) {
-        if (currState != gameState.MENU) {
-            if (save == null) {
-                save = new History();
-            }
-            save.addCommand(c);
-            save.save();
+        if (Character.toUpperCase(c) == 'L') {
+            currState = gameState.LOAD;
+        } else if (currState != gameState.LISTEN
+                && c != ':') {
+            save.addCommand(Character.toUpperCase(c));
         }
         switch (currState) {
             case MENU: menuStrokes(c);
@@ -172,6 +182,9 @@ public class Engine {
                 break;
             case LISTEN:
                 listenStrokes(c);
+                break;
+            case LOAD:
+                load();
                 break;
             default: break;
         }
@@ -192,30 +205,40 @@ public class Engine {
                 break;
         }
     }
-    public void load() {
+    public void loadSave() {
+        this.seed = 0;
+        if (currState == gameState.LOAD) {
+            save = new History();
+            return;
+        }
         File CWD = new File(System.getProperty("user.dir"));
         File saveFile = Paths.get(CWD.getPath(), "savefile.txt").toFile();
         if (saveFile.exists()) {
             try (Scanner reader = new Scanner(saveFile)) {
-                String commands = reader.nextLine();
-                commands = commands.substring(0, commands.length()-2);
-                save = new History();
-                save.addCommands(commands);
-                currState = gameState.MENU;
-                interactWithInputString(commands);
-                currState = gameState.PLAY;
-                if (stringMode == false) {
-                    inputSource = new KeyboardInputSource();
-                    init();
+                this.save = new History();
+                if (reader.hasNextLine()) {
+                    String line = reader.nextLine();
+                    //commands = commands.substring(0, commands.length()-2);
+                    save.addCommands(line);
                 }
+            } catch (IOException e) {
             }
-            catch (IOException e) {
-            }
+        } else {
+            save = new History();
+        }
+    }
+    public void load() {
+        interactWithInputString(save.getCommands());
+        currState = gameState.PLAY;
+        if (stringMode == false) {
+            inputSource = new KeyboardInputSource();
+            init();
         }
     }
     public void menuStrokes(char c) {
         switch (Character.toUpperCase(c)) {
             case 'N':
+                save.addCommands("N");
                 currState = gameState.SEEDING;
                 drawSeed();
                 break;
