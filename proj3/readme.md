@@ -22,7 +22,7 @@ https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70a
 ## Installation & Usage
 - Clone the Gitlet repository to your folder of choice on your local machine.
 - Compile all the Java classes:
-  ```javac byow/Core/*.java```
+  ```javac byow/*.java```
 - Run the main class
 - N kicks off a new game. L loads the previous game (if one exists).
 - Enter a number of your choosing. This is the seed of the pseudo-random generator.
