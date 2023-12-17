@@ -24,38 +24,12 @@ https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70a
 - Compile all the Java classes:
   ```javac byow/Core/*.java```
 - Run the main class
-- N kicks off a new game
+- N kicks off a new game. L loads the previous game (if one exists).
 - Enter a number of your choosing. This is the seed of the pseudo-random generator.
 - S starts the game.
 - W, S, A, D are the controls to get around.
+- Pressing ':' then 'Q' quits the game with a save.
 - During gameplay, if you want to see the whole world, you can turn on "Zeus Mode" by hitting Z.
-
-## Usage
-Note that abbreviated commits work.
-- Initialize a repo: ```java gitlet.Main init```
-- Add a file: java ```gitlet.Main add [file name]```
-- Remove a file: ```java gitlet.Main rm [file name]```
-- Commit: ```java gitlet.Main commit [message]```
-- See the commit history: ```java gitlet.Main log```
-- See the global commit history: ```java gitlet.Main global-log```
-- Search for commits with a given message:
-  ```java gitlet.Main find [commit message]```
-- See current status of repo (current branch, staged files, removed files, modified not staged for files, and untracked files):
-  ```java gitlet.Main status```
-- Checkout a file from head commit:
-  ```java gitlet.Main checkout -- [file name]```
-- Checkout a file from a given commit:
-  ```java gitlet.Main checkout [commit id] -- [file name]```
-- Checkout a branch:
-  ```java gitlet.Main checkout [branch name]```
-- Create a branch:
-  ```java gitlet.Main branch [branch name]```
-- Remove a branch:
-  ```java gitlet.Main rm-branch [branch name]```
-- Reset to a commit:
-  ```java gitlet.Main reset [commit id]```
-- Merge files from the given branch into the current branch:
-  ```java gitlet.Main merge [branch name]```
 
 ## Design
 See the basic class structure I used below:
