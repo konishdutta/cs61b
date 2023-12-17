@@ -33,7 +33,9 @@ https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70a
 
 ## Design
 See the basic class structure I used below:
-![Structure](https://github.com/konishdutta/cs61b/blob/ed54a1c604c3afb857d2fae143f8da15dfebbf30/proj2/imgs/class_structure.png "Structure")
+![World Generator Class Structure](https://github.com/konishdutta/cs61b/assets/16747354/d873549e-c9e7-42a8-be28-a1e6c7ee366e)
+![Renderer Class Structure](https://github.com/konishdutta/cs61b/assets/16747354/3a1b43be-aeff-4099-82c2-d8b2dd864af2)
+
 The persistence layer includes:
 - HEAD: file that loads the head commit
 - MAP_KV: file that maps strings to commits
