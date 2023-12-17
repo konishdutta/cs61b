@@ -5,7 +5,13 @@ import byow.TileEngine.TETile;
 import edu.princeton.cs.algs4.StdDraw;
 
 import java.awt.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Random;
+import java.util.Scanner;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -13,16 +19,18 @@ public class Engine {
     private InputSource inputSource;
     public static final int WIDTH = 80;
     public static final int HEIGHT = 30;
+    History save;
     public World world;
     public enum gameState {
-        MENU, SEEDING, PLAY, EXIT, LOAD
+        MENU, SEEDING, PLAY, EXIT, LOAD, LISTEN
     }
     public gameState currState = gameState.MENU;
     private int seed = 0;
     public static void main(String[] args) {
         Engine e = new Engine();
-        e.interactWithInputString("n4805805086739915435s");
-        //e.interactWithKeyboard();
+        //e.interactWithInputString("n4805805086739915435s");
+        //e.interactWithInputString("n4805805086739915435sw");
+        e.interactWithKeyboard();
     }
     public void exit() {
         StdDraw.clear(Color.BLACK);
@@ -58,31 +66,44 @@ public class Engine {
         StdDraw.setPenColor(Color.WHITE);
         StdDraw.setFont(font);
         StdDraw.text(0.5, 0.5, String.valueOf(seed));
-        StdDraw.text(0.5, 0.35, "P - Play");
+        StdDraw.text(0.5, 0.35, "S - Start");
         StdDraw.show();
     }
     public void play() {
-
         this.world = new World(seed);
-        System.out.println(seed);
         world.startRandomGame();
+        init();
+
+    }
+    public void init() {
         if (inputSource instanceof KeyboardInputSource) {
             ter.initialize(WIDTH, HEIGHT);
             run();
         }
-
     }
 
     public void run() {
-        TETile[][] frame = world.getMap();
+
         //ter.renderSimpleLight(frame, world, 5);
-        //ter.renderRayLight(frame, world, 5);
-        ter.renderFrame(frame);
+        TETile[][] frame = world.getMap();
+        while (!inputSource.possibleNextInput() &&
+                inputSource instanceof KeyboardInputSource) {
+            ter.renderRayLight(frame, world, 40);
+            try {
+                Random random = new Random();
+                int sleep = 100 + random.nextInt(25);
+                Thread.sleep(sleep);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+
+        }
+        //ter.renderFrame(frame);
     }
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
-     * including inputs from the main menu.
+     * including inputs from the main menu.wsw
      */
 
     public void interactWithKeyboard() {
@@ -92,6 +113,13 @@ public class Engine {
         while (currState != gameState.EXIT) {
             if (inputSource.possibleNextInput()) {
                 char key = inputSource.getNextKey();
+                if (currState != gameState.MENU) {
+                    if (save == null) {
+                        save = new History();
+                    }
+                    save.addCommand(key);
+                    save.save();
+                }
                 processKey(key);
             }
         }
@@ -118,17 +146,11 @@ public class Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
-        // passed in as an argument, and return a 2D tile representation of the
-        // world that would have been drawn if the same inputs had been given
-        // to interactWithKeyboard().
-        //
-        // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
-        // that works for many different input types.
-
+        System.out.println(input);
         this.inputSource = new StringInputSource(input);
         while (inputSource.possibleNextInput()) {
             char key = inputSource.getNextKey();
+            System.out.println(key);
             processKey(key);
             }
         System.out.println(TETile.toString(world.getMap()));
@@ -143,6 +165,9 @@ public class Engine {
                 break;
             case PLAY:
                 playStrokes(c);
+                break;
+            case LISTEN:
+                listenStrokes(c);
                 break;
             default: break;
         }
@@ -163,6 +188,26 @@ public class Engine {
                 break;
         }
     }
+    public void load() {
+        File CWD = new File(System.getProperty("user.dir"));
+        File saveFile = Paths.get(CWD.getPath(), "savefile.txt").toFile();
+        if (saveFile.exists()) {
+            try (Scanner reader = new Scanner(saveFile)) {
+                String commands = reader.nextLine();
+                commands = commands.substring(0, commands.length()-2);
+                save = new History();
+                save.addCommands(commands);
+                System.out.println(commands);
+                currState = gameState.MENU;
+                interactWithInputString(commands);
+                currState = gameState.PLAY;
+                inputSource = new KeyboardInputSource();
+                init();
+            }
+            catch (IOException e) {
+            }
+        }
+    }
     public void menuStrokes(char c) {
         switch (Character.toUpperCase(c)) {
             case 'N':
@@ -171,6 +216,7 @@ public class Engine {
                 break;
             case 'L':
                 currState = gameState.LOAD;
+                load();
                 break;
             case 'Q':
                 currState = gameState.EXIT;
@@ -178,6 +224,17 @@ public class Engine {
                 return;
 
             default:
+                break;
+        }
+    }
+    public void listenStrokes(char c) {
+        switch (Character.toUpperCase(c)) {
+            case 'Q':
+                currState = gameState.EXIT;
+                exit();
+                return;
+            default:
+                currState = gameState.PLAY;
                 break;
         }
     }
@@ -198,6 +255,9 @@ public class Engine {
             case 'D':
                 world.moveAvatar(ut.Direction.EAST);
                 run();
+                break;
+            case ':':
+                currState = gameState.LISTEN;
                 break;
 
             default:

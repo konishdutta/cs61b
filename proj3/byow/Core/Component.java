@@ -43,6 +43,9 @@ public class Component {
     public boolean nothing() {
         return this instanceof Nothing;
     }
+    public boolean light() {
+        return this instanceof LightSource;
+    }
     public boolean door() {
         return this instanceof Door;
     }

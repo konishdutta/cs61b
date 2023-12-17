@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.Arrays;
 import java.util.Random;
 
+import byow.Core.LightBlend;
 import edu.princeton.cs.introcs.StdDraw;
 import byow.Core.RandomUtils;
 
@@ -192,25 +193,57 @@ public class TETile {
 
         return copy;
     }
-    public static TETile applyLightingEffect(TETile t, double darkeningFactor) {
-        Color oldColor = t.textColor;
-        int newRed = darkenColorValue(oldColor.getRed(), darkeningFactor);
-        int newGreen = darkenColorValue(oldColor.getGreen(), darkeningFactor);
-        int newBlue = darkenColorValue(oldColor.getBlue(), darkeningFactor);
+    public TETile applyLightingEffect(double lightFactor) {
+        Color oldColor = this.textColor;
+        int newRed = adjustColorValue(oldColor.getRed(), lightFactor);
+        int newGreen = adjustColorValue(oldColor.getGreen(), lightFactor);
+        int newBlue = adjustColorValue(oldColor.getBlue(), lightFactor);
 
-        Color oldBgColor = t.backgroundColor;
-        int bgRed = darkenColorValue(oldBgColor.getRed(), darkeningFactor);
-        int bgGreen = darkenColorValue(oldBgColor.getGreen(), darkeningFactor);
-        int bgBlue = darkenColorValue(oldBgColor.getBlue(), darkeningFactor);
+        Color oldBgColor = this.backgroundColor;
+        int bgRed = adjustColorValue(oldBgColor.getRed(), lightFactor);
+        int bgGreen = adjustColorValue(oldBgColor.getGreen(), lightFactor);
+        int bgBlue = adjustColorValue(oldBgColor.getBlue(), lightFactor);
 
         Color c = new Color(newRed, newGreen, newBlue);
         Color bg = new Color(bgRed, bgGreen, bgBlue);
-
-        return new TETile(t, c, bg);
+        return new TETile(this, c, bg);
+    }
+    // light factor is in [-1, 1]
+    private static int adjustColorValue(int value, double lightFactor) {
+        int newValue = (int) (value * lightFactor);
+        //int newValue = (int) (value * (1 - lightFactor));
+        return Math.min(255, Math.max(0, newValue));
     }
 
-    private static int darkenColorValue(int value, double darkeningFactor) {
-        int newValue = (int) (value * (1 - darkeningFactor));
-        return Math.min(255, Math.max(0, newValue));
+    public static TETile blendLight(TETile t, LightBlend lb) {
+        double intensity = lb.intensity();
+        Color targetColor = lb.color();
+        Color bgColor = t.backgroundColor;
+        Color fgColor = t.textColor;
+        Color finalBg = blendColors(bgColor, targetColor, intensity);
+        Color finalFg = blendColors(fgColor, targetColor, intensity);
+        if (t.equals(Tileset.AVATAR)) {
+            finalFg = Color.WHITE;
+        }
+        return new TETile(t, finalFg, finalBg);
+    }
+    public static Color blendColors(Color baseColor, Color newColor, double intensity) {
+        int baseRed = baseColor.getRed();
+        int baseGreen = baseColor.getGreen();
+        int baseBlue = baseColor.getBlue();
+
+        int newRed = newColor.getRed();
+        int newGreen = newColor.getGreen();
+        int newBlue = newColor.getBlue();
+
+        int finRed = (int) ((newRed * intensity) + (baseRed * (1 - intensity)));
+        int finGreen = (int) (((newGreen * intensity) + (baseGreen * (1 - intensity))));
+        int finBlue = (int) (((newBlue * intensity) + (baseBlue * (1 - intensity))));
+        //finRed = newRed;
+        //finGreen = newGreen;
+        //finBlue = newBlue;
+
+        Color res = new Color(Math.max(0, Math.min(255, finRed)), Math.max(0, Math.min(255, finGreen)), Math.max(0, Math.min(255, finBlue)));
+        return res;
     }
 }

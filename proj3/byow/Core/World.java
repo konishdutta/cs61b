@@ -15,7 +15,7 @@ public class World {
     public HashMap<Position, Component> pc;
     private Avatar avatar;
     private Component avatarComp;
-    private Set<Ariane> goldenString;
+    private Set<LightSource> goldenString;
 
     public World(long SEED) {
         this.SEED = SEED;
@@ -243,6 +243,34 @@ public class World {
             build(avatar);
         }
     }
+    public void generateRandomLights() {
+        int randIter = randNum(0, 20);
+        for (int i = 0; i < randIter; i++) {
+            int randRoom = randNum(0, spaceList.size());
+            Space randSpace = spaceList.get(randRoom);
+            if (randSpace instanceof Hallway) {
+                continue;
+            }
+            Position newPos = randSpace.findRandomEmptyPosition();
+            if (newPos == null) {
+                continue;
+            }
+            double power = 150 + randNum(0, 100);
+            power /= 100;
+            LightSource newLight;
+            int coinFlip = randNum(0, 2);
+            switch(coinFlip) {
+                case 0:
+                    newLight = new LightSource(newPos, randSpace, 28, 99, 255, power);
+                    break;
+                default:
+                    newLight = new LightSource(newPos, randSpace, 187, 10, 30, power);
+                    break;
+            }
+            build(newLight);
+            goldenString.add(newLight);
+        }
+    }
 
     public void findAppropriateString() {
         boolean safe = false;
@@ -280,13 +308,14 @@ public class World {
         build(newDoor2);
     }
 
-    public Set<Ariane> getGold() {
+    public Set<LightSource> getGold() {
         return goldenString;
     }
     public void startRandomGame() {
         randomLayout();
         findAppropriateString();
         placeRandomAvatar();
+        generateRandomLights();
     }
 
     public static void main(String[] args) {

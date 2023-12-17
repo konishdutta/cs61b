@@ -144,6 +144,23 @@ public class Space {
         }
         return null;
     }
+    public Position findRandomEmptyPosition() {
+        int blX = this.position.x();
+        int blY = this.position.y();
+        int failOver = 0;
+        Position candidatePos = null;
+        while (candidatePos == null && failOver < 10) {
+            int randX = world().randNum(1, width);
+            int randY = world().randNum(1, height);
+            candidatePos = new Position(blX + randX, blY + randY);
+            if (world.getComponentByPosition(candidatePos) instanceof Floor &&
+                    !(world.getComponentByPosition(candidatePos) instanceof LightSource)) {
+                return candidatePos;
+            }
+            failOver += 1;
+        }
+        return null;
+    }
     public Hallway checkWallsForHalls(Set<Space> visited) {
         ut.Direction d = ut.Direction.NORTH;
         for (int i = 0; i < 4; i++) {

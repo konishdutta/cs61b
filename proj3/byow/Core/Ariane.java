@@ -7,6 +7,6 @@ import java.awt.*;
 
 public class Ariane extends LightSource {
     public Ariane(Position position, Space parent) {
-        super(position, parent, 255, 184, 28, 10);
+        super(position, parent, 255, 184, 28, 1);
     }
 }
