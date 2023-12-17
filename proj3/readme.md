@@ -32,19 +32,14 @@ https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70a
 - During gameplay, if you want to see the whole world, you can turn on "Zeus Mode" by hitting Z.
 
 ## Design
-See the basic class structure I used below:
+See the basic class structure I used below. I've omitted the class I used for persistence.
 ![World Generator Class Structure](https://github.com/konishdutta/cs61b/assets/16747354/d873549e-c9e7-42a8-be28-a1e6c7ee366e)
 ![Renderer Class Structure](https://github.com/konishdutta/cs61b/assets/16747354/3a1b43be-aeff-4099-82c2-d8b2dd864af2)
 
-The persistence layer includes:
-- HEAD: file that loads the head commit
-- MAP_KV: file that maps strings to commits
-- COMMIT_ABBREV: this acts like a hashtable to speed up abbreviated commit search. More below.
-- CURRENT_BRANCH: pointer for the current branch
-- staging folder: each staged blob is saved here
-- commits folder: each commit is saved here
-- blobs folder: each blob found in a commit is saved here.
-  Note that multiple commits may share blobs to save space.
+## World Generator Algorithm
+
+
+## Raycasting Algorithm
 
 ### Interesting Challenges
 - I deduped blobs and commits using SHA-1 IDs. This ensured that
