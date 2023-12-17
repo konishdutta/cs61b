@@ -16,8 +16,8 @@ public class Space {
         this.position = null;
         this.world = w;
         this.adjSpaces = new HashSet<>();
-        this.id = w.spaceList.size();
-        w.spaceList.add(this);
+        this.id = w.spaceList().size();
+        w.addSpace(this);
     }
 
     public int height() {
@@ -97,7 +97,7 @@ public class Space {
             s.dfsHelper(visited);
         }
     }
-    public Position getWallStart(ut.Direction d) {
+    public Position getWallStart(Ut.Direction d) {
         Position start = null;
         switch(d) {
             case NORTH:
@@ -116,7 +116,7 @@ public class Space {
         return start;
     }
 
-    public Position quickHall(ut.Direction d, Set<Space> visited) {
+    public Position quickHall(Ut.Direction d, Set<Space> visited) {
         int iter = 0;
         switch(d) {
             case NORTH, SOUTH:
@@ -136,11 +136,11 @@ public class Space {
                 count += 1;
             }
             if (count == 2) {
-                currPos = currPos.moveDirection(ut.counterclock(d));
+                currPos = currPos.moveDirection(Ut.counterclock(d));
                 return currPos;
             }
             currNeighbor = newNeighbor;
-            currPos = currPos.moveDirection(ut.clockwise(d));
+            currPos = currPos.moveDirection(Ut.clockwise(d));
         }
         return null;
     }
@@ -162,7 +162,7 @@ public class Space {
         return null;
     }
     public Hallway checkWallsForHalls(Set<Space> visited) {
-        ut.Direction d = ut.Direction.NORTH;
+        Ut.Direction d = Ut.Direction.NORTH;
         for (int i = 0; i < 4; i++) {
             Position p = quickHall(d, visited);
             if (p != null) {
@@ -171,7 +171,7 @@ public class Space {
                 Hallway newHall = newDoor.launchHallway(d, 1, Engine.WIDTH);
                 return newHall;
             }
-            d = ut.clockwise(d);
+            d = Ut.clockwise(d);
         }
         return null;
     }

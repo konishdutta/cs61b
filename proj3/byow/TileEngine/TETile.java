@@ -243,7 +243,9 @@ public class TETile {
         //finGreen = newGreen;
         //finBlue = newBlue;
 
-        Color res = new Color(Math.max(0, Math.min(255, finRed)), Math.max(0, Math.min(255, finGreen)), Math.max(0, Math.min(255, finBlue)));
+        Color res = new Color(Math.max(0, Math.min(255, finRed)),
+                Math.max(0, Math.min(255, finGreen)),
+                Math.max(0, Math.min(255, finBlue)));
         return res;
     }
 }

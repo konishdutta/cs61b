@@ -1,8 +1,5 @@
 package byow.Core;
-
 import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
-
 import java.util.*;
 
 public class Component {
@@ -52,19 +49,20 @@ public class Component {
     public World world() {
         return world;
     };
-    public int probeForHallSpan(ut.Direction d, int span) {
+    public int probeForHallSpan(Ut.Direction d, int span) {
         World w = world;
         Position origin = position();
         //first check if you should just probe for a door
         Position doorCheck = origin.moveDirection(d);
-        if (!doorCheck.outOfBounds() && w.getComponentByPosition(doorCheck).wall() && this.wall()) {
+        if (!doorCheck.outOfBounds()
+                && w.getComponentByPosition(doorCheck).wall()
+                && this.wall()) {
             Wall probewall = (Wall) this;
-            //Wall probeWall = (Wall) w.getComponentByPosition(doorCheck);
             return probewall.probeForDoor(d, span) * -1;
             //return -1 so that the upstream command can differentiate walls & doors
         }
         //start from the counter-clockwise direction in front of you and probe for the span that you can go.
-        Position curr = origin.moveDirection(d).moveDirection(ut.counterclock(d));
+        Position curr = origin.moveDirection(d).moveDirection(Ut.counterclock(d));
         int res = 0;
         //check that the first two positions are actually empty
         //that's the bare minimum to have a hallway
@@ -73,7 +71,7 @@ public class Component {
                 return 0;
             }
             // now you move clockwise to where you're expanding
-            curr = curr.moveDirection(ut.clockwise(d));
+            curr = curr.moveDirection(Ut.clockwise(d));
         }
         //now probe the actual span
         for (int i = 0; i < span; i++) {
@@ -81,7 +79,7 @@ public class Component {
                 break;
             }
             res += 1;
-            curr = curr.moveDirection(ut.clockwise(d));
+            curr = curr.moveDirection(Ut.clockwise(d));
         }
         return res;
     }
@@ -100,8 +98,10 @@ public class Component {
             if (curr.equals(destination)) {
                 return constructPath(parentMap, destination);
             }
-            if (!curr.outOfBounds() && (world().getComponentByPosition(curr).floor() || world().getComponentByPosition(curr).door())) {
-                for (ut.Direction dir : ut.Direction.values()) {
+            if (!curr.outOfBounds()
+                    && (world().getComponentByPosition(curr).floor()
+                            || world().getComponentByPosition(curr).door())) {
+                for (Ut.Direction dir : Ut.Direction.values()) {
                     Position next = curr.moveDirection(dir);
                     if (!visited.contains(next)) {
                         q.add(next);
@@ -130,7 +130,7 @@ public class Component {
     }
     public int hashCode() {
         int hash = 0;
-        switch(this.getClass().getSimpleName()) {
+        switch (this.getClass().getSimpleName()) {
             case "Nothing": hash = 1;
             break;
             case "Door": hash = 2;
@@ -139,6 +139,7 @@ public class Component {
             break;
             case "Wall": hash = 4;
             break;
+            default: break;
         }
         return position.x() * 1000 + position.y() * 100 + hash;
     }

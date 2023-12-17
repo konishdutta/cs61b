@@ -3,20 +3,17 @@ package byow.Core;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Door extends Wall {
-    Space adjoiningParent;
-    TETile r = Tileset.FLOOR;
+    private Space adjoiningParent;
+    private static final TETile R = Tileset.FLOOR;
     public Door(Wall wall) {
         super(wall.position(), wall.parent());
-        this.setRep(r);
+        this.setRep(R);
         world().removeWall(wall);
         world().addDoor(this);
     }
 
-    public void doubleDoor(ut.Direction d, int width) {
+    public void doubleDoor(Ut.Direction d, int width) {
         Position curr = position();
         for (int i = 0; i < width; i++) {
             //be simple, make a new wall there, and then turn that into a door
@@ -29,18 +26,19 @@ public class Door extends Wall {
             Position pastP = newP.moveDirection(d);
             Component newC = world().getComponentByPosition(newP);
             Space newParent = newC.parent();
-            if (!newP.outOfBounds() && !pastP.outOfBounds() && !world().getComponentByPosition(pastP).nothing()) {
+            if (!newP.outOfBounds() && !pastP.outOfBounds()
+                    && !world().getComponentByPosition(pastP).nothing()) {
 
                 Wall newWall = new Wall(newP, newParent);
                 Door newDoor = new Door(newWall);
             }
             this.adjoiningParent = newParent;
             currParent.connect(newParent);
-            curr = curr.moveDirection(ut.clockwise(d));
+            curr = curr.moveDirection(Ut.clockwise(d));
         }
     }
 
-    public Hallway launchHallway(ut.Direction d, int span, int size) {
+    public Hallway launchHallway(Ut.Direction d, int span, int size) {
         World w = world();
         int randSpan = w.randNum(1, span + 1);
         if (size == 0) {

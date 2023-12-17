@@ -6,7 +6,6 @@ import edu.princeton.cs.introcs.StdDraw;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -18,7 +17,6 @@ import java.util.Random;
  */
 public class TERenderer {
     private static final int TILE_SIZE = 16;
-    private static final int lightCap = 100;
     private static final int MIN_FLICKER = 70;
     private int width;
     private int height;
@@ -123,9 +121,6 @@ public class TERenderer {
 
         for (int x = 0; x < numXTiles; x++) {
             for (int y = 0; y < numYTiles; y++) {
-                if (world[x][y] == null) {
-                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y + " is null.");
-                }
                 double distance = calculateDistance(x, y, ax, ay);
                 double darkeningFactor = calculateDarkeningFactor(distance, lightRadius);
                 TETile litTile = world[x][y];
@@ -155,9 +150,6 @@ public class TERenderer {
 
         for (int x = 0; x < numXTiles; x++) {
             for (int y = 0; y < numYTiles; y++) {
-                if (world[x][y] == null) {
-                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y + " is null.");
-                }
                 Position pos = new Position(x, y);
                 Component c = w.getComponentByPosition(pos);
 
@@ -203,7 +195,7 @@ public class TERenderer {
         // pick a random int between min flicker and 100
         // this approach makes it more likely to go down when you are closer to the max
         int dice = MIN_FLICKER + random.nextInt(100 - MIN_FLICKER);
-        double flicker = (double)(random.nextInt(6))/100;
+        double flicker = (double) (random.nextInt(6)) / 100;
         if (dice == currFlicker) {
             return;
         }
@@ -218,7 +210,9 @@ public class TERenderer {
                 LightBlend origBlend = origLightGrid[x][y];
                 if (lightBlend != null) {
                     // Apply a random flicker within a defined range
-                    double newIntensity = Math.max((MIN_FLICKER / 100), Math.min(Math.max(0.75, origBlend.intensity()), lightBlend.intensity() + flicker));
+                    double newIntensity = Math.max((MIN_FLICKER / 100),
+                            Math.min(Math.max(0.75, origBlend.intensity()),
+                                    lightBlend.intensity() + flicker));
                     finalLightGrid[x][y] = new LightBlend(newIntensity, lightBlend.color());
                 }
             }
@@ -233,22 +227,21 @@ public class TERenderer {
         for (double angle = 0; angle < 2 * Math.PI; angle += angleIncrement) {
             double dx = Math.cos(angle);
             double dy = Math.sin(angle);
-            castFov2(w, ax, ay, dx, dy, 3);
+            castFov2(w, ax, ay, dx, dy);
         }
     }
-    private void castFov2(World w, int startX, int startY, double dx, double dy, int baseLightRadius) {
+    private void castFov2(World w, int startX, int startY, double dx, double dy) {
         double x = startX;
         double y = startY;
         int gridX = (int) Math.round(x);
         int gridY = (int) Math.round(y);
         Position curr = new Position(gridX, gridY);
-
-        double distanceTraveled = 0;
         double lightFactor = 1.5;
+
         while (!curr.outOfBounds()) {
 
             double distance = calculateDistance(gridX, gridY, startX, startY);
-            //now that you have distance. if distance = 0, just get out of loop to avoid zero division
+            //if distance = 0, just get out of loop to avoid zero division
             if (distance == 0) {
                 fov[gridX][gridY] = lightFactor;
             } else {
@@ -260,13 +253,15 @@ public class TERenderer {
                 if (finalLightGrid[gridX][gridY] != null) {
                     double intensity = finalLightGrid[gridX][gridY].intensity();
                     double a = 1; // Example value, adjust as needed\
-                    lightSourceMultiplier = Math.exp(Math.PI * intensity)/((10 + distance));
+                    lightSourceMultiplier = Math.exp(Math.PI * intensity) / ((10 + distance));
                     if (distance > 20) {
-                        lightSourceMultiplier *= (160000/Math.pow(distance, 4));
+                        lightSourceMultiplier *= (160000 / Math.pow(distance, 4));
                     }
-                    //lightSourceMultiplier = Math.min(1.5, Math.exp(10 * intensity)/Math.pow((1 + Math.PI * distance), 2));
-                    //if there is a neighboring greater light, it should be less than that?
-                    //lightSourceMultiplier = (10 * lightSourceIntensity / (1 + 0.5 * Math.pow(distance, 2)));
+                    /* other ideas I tried for lightSourceMultiplier
+                    * Math.min(1.5, Math.exp(10 * intensity) /
+                    * Math.pow((1 + Math.PI * distance), 2));
+                    * (10 * lightSourceIntensity / (1 + 0.5 * Math.pow(distance, 2)));
+                     */
                 }
                 // Combine the distance and light source multipliers
                 fov[gridX][gridY] = Math.max(distanceMultiplier, lightSourceMultiplier);
@@ -330,7 +325,8 @@ public class TERenderer {
             currY = newY;
 
 
-            double distance = calculateDistance(currX, currY, ls.position().x(), ls.position().y());
+            double distance = calculateDistance(currX, currY,
+                    ls.position().x(),ls.position().y());
             LightIntensity li = new LightIntensity(ls, distance);
             Position candidatePosition = new Position(currX, currY);
             if (candidatePosition.outOfBounds()) {
@@ -343,7 +339,7 @@ public class TERenderer {
                     !w.getComponentByPosition(candidatePosition).door()) {
                 return;
             }
-            currIntensity = li.intensity;
+            currIntensity = li.intensity();
         }
     }
     public void blendLights() {

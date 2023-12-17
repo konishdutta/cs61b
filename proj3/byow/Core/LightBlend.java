@@ -2,8 +2,8 @@ package byow.Core;
 import java.awt.Color;
 
 public class LightBlend {
-    public double intensity;
-    public Color color;
+    private double intensity;
+    private Color color;
     public LightBlend(double intensity, Color color) {
         this.intensity = intensity;
         this.color = color;

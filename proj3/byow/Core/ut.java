@@ -1,6 +1,6 @@
 package byow.Core;
 
-public class ut {
+public class Ut {
     public enum Direction {
         NORTH,
         SOUTH,
@@ -9,7 +9,7 @@ public class ut {
     }
     public static Direction clockwise(Direction d) {
         Direction res = null;
-        switch(d) {
+        switch (d) {
             case NORTH: res = Direction.EAST;
             break;
             case EAST: res = Direction.SOUTH;
@@ -18,12 +18,13 @@ public class ut {
             break;
             case WEST: res = Direction.NORTH;
             break;
+            default: break;
         }
         return res;
     }
     public static Direction counterclock(Direction d) {
         Direction res = null;
-        switch(d) {
+        switch (d) {
             case NORTH: res = Direction.WEST;
             break;
             case WEST: res = Direction.SOUTH;
@@ -32,12 +33,13 @@ public class ut {
             break;
             case EAST: res = Direction.NORTH;
             break;
+            default: break;
         }
         return res;
     }
     public static Direction inverse(Direction d) {
         Direction res = null;
-        switch(d) {
+        switch (d) {
             case NORTH: res = Direction.SOUTH;
             break;
             case WEST: res = Direction.EAST;
@@ -46,6 +48,7 @@ public class ut {
             break;
             case EAST: res = Direction.WEST;
             break;
+            default: break;
         }
         return res;
     }

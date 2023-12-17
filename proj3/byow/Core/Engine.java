@@ -3,7 +3,6 @@ package byow.Core;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import edu.princeton.cs.algs4.StdDraw;
-
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -27,15 +26,15 @@ public class Engine {
     public static void main(String[] args) {
         Engine e = new Engine();
         //e.interactWithInputString("n4805805086739915435s");
-        //e.interactWithInputString("n4805805086739915435sw");
-        e.interactWithKeyboard();
+        e.interactWithInputString("n7193300625454684331saaawasdaawd:q");
+        //e.interactWithKeyboard();
     }
     public void exit() {
         if (inputSource instanceof KeyboardInputSource) {
             StdDraw.clear(Color.BLACK);
             StdDraw.show();
+            System.exit(0);
         }
-        System.exit(0);
     }
     public void drawMenu() {
         StdDraw.setCanvasSize(WIDTH * 16, HEIGHT * 16); // Each cell is 16x16 pixels
@@ -86,8 +85,8 @@ public class Engine {
 
         //ter.renderSimpleLight(frame, world, 5);
         TETile[][] frame = world.getMap();
-        while (!inputSource.possibleNextInput() &&
-                inputSource instanceof KeyboardInputSource) {
+        while (!inputSource.possibleNextInput()
+                && inputSource instanceof KeyboardInputSource) {
             ter.renderRayLight(frame, world, 40);
             try {
                 Random random = new Random();
@@ -113,13 +112,6 @@ public class Engine {
         while (currState != gameState.EXIT) {
             if (inputSource.possibleNextInput()) {
                 char key = inputSource.getNextKey();
-                if (currState != gameState.MENU) {
-                    if (save == null) {
-                        save = new History();
-                    }
-                    save.addCommand(key);
-                    save.save();
-                }
                 processKey(key);
             }
         }
@@ -155,6 +147,13 @@ public class Engine {
         return world.getMap();
     }
     public void processKey(char c) {
+        if (currState != gameState.MENU) {
+            if (save == null) {
+                save = new History();
+            }
+            save.addCommand(c);
+            save.save();
+        }
         switch (currState) {
             case MENU: menuStrokes(c);
             break;
@@ -238,19 +237,19 @@ public class Engine {
     public void playStrokes(char c) {
         switch (Character.toUpperCase(c)) {
             case 'W':
-                world.moveAvatar(ut.Direction.NORTH);
+                world.moveAvatar(Ut.Direction.NORTH);
                 run();
                 break;
             case 'S':
-                world.moveAvatar(ut.Direction.SOUTH);
+                world.moveAvatar(Ut.Direction.SOUTH);
                 run();
                 break;
             case 'A':
-                world.moveAvatar(ut.Direction.WEST);
+                world.moveAvatar(Ut.Direction.WEST);
                 run();
                 break;
             case 'D':
-                world.moveAvatar(ut.Direction.EAST);
+                world.moveAvatar(Ut.Direction.EAST);
                 run();
                 break;
             case ':':

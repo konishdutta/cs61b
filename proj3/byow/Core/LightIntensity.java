@@ -1,8 +1,8 @@
 package byow.Core;
 
 public class LightIntensity {
-    public double intensity;
-    LightSource l;
+    private double intensity;
+    private LightSource l;
     public LightIntensity(LightSource l, double distance) {
         this.l = l;
         // inverse square law to calculate distance

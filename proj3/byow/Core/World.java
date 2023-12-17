@@ -1,24 +1,22 @@
 package byow.Core;
 
 import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
-
 import java.util.*;
 
 public class World {
-    public long SEED;
-    public Random RANDOM;
-    public TETile[][] map = new TETile[Engine.WIDTH][Engine.HEIGHT];
-    public List<Space> spaceList;
-    public Set<Door> doors;
-    public Set<Wall> walls;
-    public HashMap<Position, Component> pc;
+    private long SEED;
+    private Random RANDOM;
+    private TETile[][] map = new TETile[Engine.WIDTH][Engine.HEIGHT];
+    private List<Space> spaceList;
+    private Set<Door> doors;
+    private Set<Wall> walls;
+    private HashMap<Position, Component> pc;
     private Avatar avatar;
     private Component avatarComp;
     private Set<LightSource> goldenString;
 
-    public World(long SEED) {
-        this.SEED = SEED;
+    public World(long seed) {
+        this.SEED = seed;
         this.RANDOM = new Random(SEED);
         this.spaceList = new ArrayList<>();
         this.doors = new HashSet<>();
@@ -120,13 +118,22 @@ public class World {
     public Space getSpaceByID(int id) {
         return spaceList.get(id);
     }
+    public List<Space> spaceList() {
+        return spaceList;
+    }
+    public void addSpace(Space s) {
+        spaceList.add(s);
+    }
+    public Set<Wall> walls() {
+        return walls;
+    }
     public void generateRandomDoor() {
         // look for a door that allows us to build a hallway
         // we'll do this in two steps
         int maxWidth = 0;
         Wall candidate = null;
-        ut.Direction candidateDirection = null;
-        List<Wall> wallList= new ArrayList<>(walls);
+        Ut.Direction candidateDirection = null;
+        List<Wall> wallList = new ArrayList<>(walls);
         while (maxWidth == 0) {
             candidateDirection = null;
             //step 1) find a wall that has a potentially working direction
@@ -176,13 +183,13 @@ public class World {
         }
     }
 
-    public Space neighbor(Position p, ut.Direction d) {
+    public Space neighbor(Position p, Ut.Direction d) {
         Position curr = p;
         Space res = null;
         Space origin = getComponentByPosition(curr).parent();
-        while (!curr.outOfBounds() && (origin == null ||
-                getComponentByPosition(curr).parent() == null ||
-                origin.equals(getComponentByPosition(curr).parent()))) {
+        while (!curr.outOfBounds() && (origin == null
+                || getComponentByPosition(curr).parent() == null
+                || origin.equals(getComponentByPosition(curr).parent()))) {
             curr = curr.moveDirection(d);
         }
         if (curr.outOfBounds()) {
@@ -220,7 +227,9 @@ public class World {
             int randInt = randNum(0, spaceList.size());
             Space randSpace = spaceList.get(randInt);
             Position botLeft = randSpace.getPosition();
-            Position start = botLeft.moveDirection(ut.Direction.NORTH).moveDirection(ut.Direction.EAST);
+            // move the avatar away from the bottom left
+            Position start = botLeft.moveDirection(Ut.Direction.NORTH);
+            start = start.moveDirection(Ut.Direction.EAST);
             if (!start.outOfBounds()) {
                 avatarComp = getComponentByPosition(start);
                 this.avatar = new Avatar(start, this);
@@ -232,7 +241,7 @@ public class World {
         return avatar;
     }
 
-    public void moveAvatar(ut.Direction d) {
+    public void moveAvatar(Ut.Direction d) {
         Position curr = avatar.position();
         Position target = curr.moveDirection(d);
         if (!target.outOfBounds() &&
@@ -259,7 +268,7 @@ public class World {
             power /= 100;
             LightSource newLight;
             int coinFlip = randNum(0, 2);
-            switch(coinFlip) {
+            switch (coinFlip) {
                 case 0:
                     newLight = new LightSource(newPos, randSpace, 28, 99, 255, power);
                     break;

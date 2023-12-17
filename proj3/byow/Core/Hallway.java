@@ -2,22 +2,22 @@ package byow.Core;
 
 public class Hallway extends Room {
     private int size;
-    private ut.Direction direction;
+    private Ut.Direction direction;
     private int span;
-    public Hallway(World w, int span, int size, ut.Direction direction) {
+    public Hallway(World w, int span, int size, Ut.Direction direction) {
         super(w, calculateHeight(direction, span, size), calculateWidth(direction, span, size));
         this.direction = direction;
         this.span = span;
         this.size = size;
     }
-    private static int calculateWidth(ut.Direction direction, int span, int size) {
+    private static int calculateWidth(Ut.Direction direction, int span, int size) {
         switch(direction) {
             case NORTH, SOUTH: return span + 2;
             case EAST, WEST: return size;
             default: throw new IllegalArgumentException("Invalid direction");
         }
     }
-    private static int calculateHeight(ut.Direction direction, int span, int size) {
+    private static int calculateHeight(Ut.Direction direction, int span, int size) {
         switch(direction) {
             case NORTH, SOUTH: return size;
             case EAST, WEST: return span + 2;
@@ -85,7 +85,7 @@ public class Hallway extends Room {
         return res;
     }
 
-    public ut.Direction direction() {
+    public Ut.Direction direction() {
         return direction;
     }
     public int span() {

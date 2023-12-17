@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 public class History implements Serializable {
     private String commands = "N";
     public static final File CWD = new File(System.getProperty("user.dir"));
-    public static final File saveFile = Paths.get(CWD.getPath(), "savefile.txt").toFile();
+    public static final File SAVEFILE = Paths.get(CWD.getPath(), "savefile.txt").toFile();
 
     public void addCommand(char c) {
         commands += c;
@@ -46,6 +46,6 @@ public class History implements Serializable {
     }
 
     public void save() {
-        writeContents(saveFile, commands);
+        writeContents(SAVEFILE, commands);
     }
 }
