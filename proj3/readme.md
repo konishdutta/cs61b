@@ -9,20 +9,26 @@ are accessible. The algorithm generates random blue and red lights in rooms, alo
 golden thread (representing the thread that Theseus followed out of the labyrinth).
 
 I then built a rendering engine that implements raycasting to calculate both
-
-
-
 the player's FOV and the impact of flickering lights. The FOV expands and recedes
 depending on the light near the player. The FOV and light sources are impacted by
 walls: the player cannot see and light cannot reach beyond walls.
 
-![Theseus](https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70aa3f9b44a1)
+See video below for how this works. When the player is between the blue and red lights, they can
+see both; but the space in between is dark. Imagine standing in a dark alley and seeing a light
+far away. You would see what's around the light, but the path in between would be dark.
+
+https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70aa3f9b44a1
+
 ## Installation & Usage
 - Clone the Gitlet repository to your folder of choice on your local machine.
 - Compile all the Java classes:
   ```javac byow/Core/*.java```
 - Run the main class
-- 
+- N kicks off a new game
+- Enter a number of your choosing. This is the seed of the pseudo-random generator.
+- S starts the game.
+- W, S, A, D are the controls to get around.
+- During gameplay, if you want to see the whole world, you can turn on "Zeus Mode" by hitting Z.
 
 ## Usage
 Note that abbreviated commits work.
