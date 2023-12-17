@@ -61,7 +61,8 @@ public class Component {
             return probewall.probeForDoor(d, span) * -1;
             //return -1 so that the upstream command can differentiate walls & doors
         }
-        //start from the counter-clockwise direction in front of you and probe for the span that you can go.
+        //start from the counter-clockwise direction in front of you
+        //probe for the span that you can go.
         Position curr = origin.moveDirection(d).moveDirection(Ut.counterclock(d));
         int res = 0;
         //check that the first two positions are actually empty

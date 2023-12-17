@@ -26,8 +26,8 @@ public class Engine {
     public static void main(String[] args) {
         Engine e = new Engine();
         //e.interactWithInputString("n4805805086739915435s");
-        e.interactWithInputString("n7193300625454684331saaawasdaawd:q");
-        //e.interactWithKeyboard();
+        //e.interactWithInputString("n7193300625454684331saaawasdaawd:q");
+        e.interactWithKeyboard();
     }
     public void exit() {
         if (inputSource instanceof KeyboardInputSource) {

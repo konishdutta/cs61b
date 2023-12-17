@@ -11,13 +11,13 @@ public class Ut {
         Direction res = null;
         switch (d) {
             case NORTH: res = Direction.EAST;
-            break;
+                break;
             case EAST: res = Direction.SOUTH;
-            break;
+                break;
             case SOUTH: res = Direction.WEST;
-            break;
+                break;
             case WEST: res = Direction.NORTH;
-            break;
+                break;
             default: break;
         }
         return res;
@@ -26,13 +26,13 @@ public class Ut {
         Direction res = null;
         switch (d) {
             case NORTH: res = Direction.WEST;
-            break;
+                break;
             case WEST: res = Direction.SOUTH;
-            break;
+                break;
             case SOUTH: res = Direction.EAST;
-            break;
+                break;
             case EAST: res = Direction.NORTH;
-            break;
+                break;
             default: break;
         }
         return res;
@@ -41,13 +41,13 @@ public class Ut {
         Direction res = null;
         switch (d) {
             case NORTH: res = Direction.SOUTH;
-            break;
+                break;
             case WEST: res = Direction.EAST;
-            break;
+                break;
             case SOUTH: res = Direction.NORTH;
-            break;
+                break;
             case EAST: res = Direction.WEST;
-            break;
+                break;
             default: break;
         }
         return res;

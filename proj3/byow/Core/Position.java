@@ -1,8 +1,5 @@
 package byow.Core;
 
-import byow.TileEngine.Tileset;
-
-
 public class Position {
     private int x;
     private int y;

@@ -244,8 +244,9 @@ public class World {
     public void moveAvatar(Ut.Direction d) {
         Position curr = avatar.position();
         Position target = curr.moveDirection(d);
-        if (!target.outOfBounds() &&
-                (getComponentByPosition(target) instanceof Floor || getComponentByPosition(target) instanceof Door)) {
+        if (!target.outOfBounds()
+                && (getComponentByPosition(target) instanceof Floor
+                || getComponentByPosition(target) instanceof Door)) {
             build(avatarComp);
             avatarComp = getComponentByPosition(target);
             avatar = new Avatar(target, this);

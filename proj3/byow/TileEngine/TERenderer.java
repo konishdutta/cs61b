@@ -245,7 +245,7 @@ public class TERenderer {
             if (distance == 0) {
                 fov[gridX][gridY] = lightFactor;
             } else {
-                double distanceMultiplier = lightFactor / (1+ 0.5 * (Math.pow(distance, 2)));
+                double distanceMultiplier = lightFactor / (1 + 0.5 * (Math.pow(distance, 2)));
                 if (distanceMultiplier < 0.001) {
                     distanceMultiplier = 0;
                 }
@@ -267,8 +267,8 @@ public class TERenderer {
                 fov[gridX][gridY] = Math.max(distanceMultiplier, lightSourceMultiplier);
             }
             // if you hit a wall, exit
-            if (w.getComponentByPosition(curr) instanceof Wall &&
-                    !(w.getComponentByPosition(curr) instanceof Door)) {
+            if (w.getComponentByPosition(curr) instanceof Wall
+                    && !(w.getComponentByPosition(curr) instanceof Door)) {
                 break;
             }
 
@@ -326,7 +326,7 @@ public class TERenderer {
 
 
             double distance = calculateDistance(currX, currY,
-                    ls.position().x(),ls.position().y());
+                    ls.position().x(), ls.position().y());
             LightIntensity li = new LightIntensity(ls, distance);
             Position candidatePosition = new Position(currX, currY);
             if (candidatePosition.outOfBounds()) {
@@ -335,8 +335,8 @@ public class TERenderer {
             if (!lightGrid[currX][currY].contains(li)) {
                 lightGrid[currX][currY].add(li);
             }
-            if (w.getComponentByPosition(candidatePosition).wall() &&
-                    !w.getComponentByPosition(candidatePosition).door()) {
+            if (w.getComponentByPosition(candidatePosition).wall()
+                    && !w.getComponentByPosition(candidatePosition).door()) {
                 return;
             }
             currIntensity = li.intensity();
