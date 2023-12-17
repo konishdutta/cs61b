@@ -9,10 +9,14 @@ are accessible. The algorithm generates random blue and red lights in rooms, alo
 golden thread (representing the thread that Theseus followed out of the labyrinth).
 
 I then built a rendering engine that implements raycasting to calculate both
+
+
+
 the player's FOV and the impact of flickering lights. The FOV expands and recedes
 depending on the light near the player. The FOV and light sources are impacted by
 walls: the player cannot see and light cannot reach beyond walls.
-![](TheseusFinished.mp4)
+
+![Theseus](https://github.com/konishdutta/cs61b/assets/16747354/8f95b3fb-774d-46da-991e-70aa3f9b44a1)
 ## Installation & Usage
 - Clone the Gitlet repository to your folder of choice on your local machine.
 - Compile all the Java classes:
