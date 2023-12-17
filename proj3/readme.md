@@ -37,7 +37,19 @@ See the basic class structure I used below. I've omitted the class I used for pe
 ![Renderer Class Structure](https://github.com/konishdutta/cs61b/assets/16747354/3a1b43be-aeff-4099-82c2-d8b2dd864af2)
 
 ## World Generator Algorithm
+The algorithm does the following at a high level:
+- For a random number of times, generate a room of random size.
+   - There are some safety checks to ensure rooms don't overlap.
+- For a random number of times, generate hallways of random sizes that come out of these rooms.
+   - This involves understanding which direction a hallway should emerge. For example, a hallway should be oriented east if it's coming out from the east wall of a room. There is a function that handles this.
+- If a hallway hits another room, stop the hallway and add a door.
+- After the initial set of random calls, check if all hallways and rooms are connected.
+- While not all spaces are connected:
+   - If they are not connected, pick a random room. Check every direct neighbor (north, south, east, west) the room has.
+   - If a neighbor is not connected to the room, draw a hallway to that neighbor.
+   - If no room has a direct neighbor, draw another random hallway and try again.
 
+There are some checks in place to ensure that while loops are forced to terminate.
 
 ## Raycasting Algorithm
 
