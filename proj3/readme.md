@@ -52,4 +52,17 @@ The algorithm does the following at a high level:
 There are some checks in place to ensure that while loops are forced to terminate.
 
 ## Raycasting Algorithm
-Coming soon
+### Field of View (FOV) generation
+The FOV algorithm simulates the visible area around a player, determining how far they can see within a virtual environment. It operates as follows:
+1. **Initialization**: The algorithm starts with initial coordinates (x, y) and directional increments (dx, dy), alongside a specified light radius that represents the maximum distance the player can see.
+2. **Traversal and Obstacle Detection**: Iteratively, the algorithm advances (x, y) by (dx, dy) while tracking the total distance traveled. At each step, it checks if the new (x, y) location hits a wall:
+   * If a wall is encountered, the current location is marked as visible within the FOV (since light reaches up to the obstacle), and the loop terminates for this ray, simulating the obstruction of sight.
+   * If no obstacle is encountered and the distance traveled is within the light radius, the location is marked as within the FOV, and the algorithm continues to the next iteration.
+3. **Distance Calculation**: The distance traveled is updated using a Euclidean metric, ensuring accurate simulation of sight range.
+### Light Generation
+To simulate dynamic lighting within the environment, a modified FOV algorithm is employed that considers light sources and their interaction with the surroundings:
+1. **Light Source Processing**: For each light source, a specialized FOV algorithm calculates the spread of light, incorporating a decay factor based on distance to simulate the dimming effect. This process introduces a degree of randomness to simulate flickering lights, enhancing the realism of the environment.
+2. **Light Blending**: The intensities and colors of light from different sources are blended at each point in the environment, considering the cumulative effect of multiple light sources and creating a cohesive lighting effect.
+3. **Visibility Enhancement**: The player's FOV is augmented by checking for direct lines of sight to light sources. If a direct path from the player to a light source is unobstructed by walls, the visibility in that direction is enhanced, simulating the ability to see lights from afar even if the intermediate space is not within the direct FOV.
+
+
