@@ -65,4 +65,7 @@ To simulate dynamic lighting within the environment, a modified FOV algorithm is
 2. **Light Blending**: The intensities and colors of light from different sources are blended at each point in the environment, considering the cumulative effect of multiple light sources and creating a cohesive lighting effect.
 3. **Visibility Enhancement**: The player's FOV is augmented by checking for direct lines of sight to light sources. If a direct path from the player to a light source is unobstructed by walls, the visibility in that direction is enhanced, simulating the ability to see lights from afar even if the intermediate space is not within the direct FOV.
 
+Vectors were instrumental in modeling the direction and magnitude of both light and visibility rays, allowing for precise control over their propagation through the game environment. By representing direction increments (dx, dy) as vectors, we could accurately simulate the raycasting mechanism underlying the FOV and lighting systems.
+
+Matrices played a crucial role in performing complex transformations necessary for simulating realistic lighting effects. This includes calculating the attenuation of light intensity over distance and blending the colors of multiple light sources. By employing matrix operations, I could efficiently compute the cumulative impact of multiple lights on the game’s environment, resulting in a nuanced and dynamic lighting model.
 
